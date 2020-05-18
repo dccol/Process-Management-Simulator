@@ -2,6 +2,7 @@
 #ifndef PROCESS_H
 #define PROCESS_H
 
+
 /**
  * data structure to contain process information
  */
@@ -15,5 +16,6 @@ typedef struct process {
 process_t *new_process();
 
 void populate_process_t(process_t *process, int i, char* data);
+
 
 #endif

@@ -73,7 +73,7 @@ int main(int argc, char **argv) {
     int quantum = 10;
 
     if(strstr(alg, "rr")){
-        rr(process_queue, quantum);
+        rr(pending_process_queue, process_queue, quantum);
     }
     if(strstr(alg, "ff")) {
         fc_fs(pending_process_queue, process_queue);
