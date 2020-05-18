@@ -26,7 +26,7 @@ int main(int argc, char **argv) {
     while (fgets(str, MAX_CHAR, processes_file) != NULL) {
         printf("%s", str);
 
-        process_t process;
+        process_t *process;
 
         // SPLIT INTO VARIABLES
         char *token = strtok(str, " ");
@@ -34,7 +34,7 @@ int main(int argc, char **argv) {
         int i = 0;
         while (token != NULL) {
 
-            populate_process_t(&process, i, token);
+            populate_process_t(process, i, token);
             token = strtok(NULL, " ");
             i++;
         }
@@ -47,7 +47,7 @@ int main(int argc, char **argv) {
          */
 
         data_t data;
-        data.process = process;
+        data.process = *process;
         deque_insert(process_queue, data);
     }
 
