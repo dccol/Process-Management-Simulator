@@ -29,6 +29,8 @@ typedef struct deque {
 
 deque_t *new_deque();
 
+data_t *new_data();
+
 void free_deque(deque_t *deque);
 
 void deque_push(deque_t *deque, data_t data);

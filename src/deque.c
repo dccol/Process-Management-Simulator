@@ -1,6 +1,7 @@
 
 /* Deque Module
- * Written by Daniel Coleman 2019*/
+ * Written by Daniel Coleman 2019
+ * Modified by Daniel Coleman 2020*/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -16,6 +17,16 @@ deque_t *new_deque() {
     deque->size = 0;
     return deque;
 }
+
+/*
+data_t *new_data() {
+    data_t *data;
+    data = (data_t*)malloc(sizeof(*data));
+    assert(data!=NULL);
+    data->process = NULL;
+    return data;
+}
+ */
 
 void free_deque(deque_t *deque) {
     node_t *curr, *prev;
