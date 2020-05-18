@@ -6,6 +6,7 @@
 #include "deque.h"
 #include "process.h"
 #include "ff.h"
+#include "rr.h"
 
 #define DEBUG 1
 
@@ -63,7 +64,16 @@ int main(int argc, char **argv) {
     // DATA READ, CLOSE FILE
     fclose(processes_file);
 
-    fc_fs(process_queue);
+    // SELECT SCHEDULE ALGORITHM
+    char *alg = "rr";
+    int quantum = 10;
+
+    if(strstr(alg, "rr")){
+        rr(process_queue, quantum);
+    }
+    if(strstr(alg, "ff")) {
+        fc_fs(process_queue);
+    }
     return 0;
 
 

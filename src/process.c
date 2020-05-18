@@ -35,11 +35,3 @@ void populate_process_t(process_t *process, int i, char* data){
         process->time_remaining = i_data;
     }
 }
-
-void run_process(process_t *process){
-
-    while(process->time_remaining > 0){
-        printf("Process %d has %d left\n", process->pid, process->time_remaining);
-        process->time_remaining--;
-    }
-}
