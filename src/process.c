@@ -4,7 +4,6 @@
 #include <assert.h>
 
 #include "process.h"
-#include "deque.h"
 
 
 process_t *new_process() {
