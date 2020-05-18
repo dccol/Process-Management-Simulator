@@ -77,7 +77,7 @@ void deque_insert(deque_t *deque, data_t data) {
     deque->size++;
 }
 
-data_t deque_pop(deque_t *deque) {
+data_t deque_remove(deque_t *deque) {
     assert(deque!=NULL && deque->foot!=NULL);
     data_t new;
 
@@ -94,7 +94,7 @@ data_t deque_pop(deque_t *deque) {
     return new;
 }
 
-data_t deque_remove(deque_t *deque) {
+data_t deque_pop(deque_t *deque) {
     assert(deque!=NULL && deque->head != NULL);
     data_t new;
     new.process = deque->head->data.process;

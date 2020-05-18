@@ -5,6 +5,7 @@
 
 #include "deque.h"
 #include "process.h"
+#include "ff.h"
 
 #define DEBUG 1
 
@@ -34,14 +35,13 @@ int main(int argc, char **argv) {
         int i = 0;
         while (token != NULL) {
 
+            // POPULATE PROCESS DATA STRUCTURE
             populate_process_t(process, i, token);
             token = strtok(NULL, " ");
             i++;
         }
 
         data_t data;
-
-        // idk about this
         data.process = process;
         deque_insert(process_queue, data);
     }
@@ -60,8 +60,10 @@ int main(int argc, char **argv) {
             curr = curr->prev;
         }
     }
-
+    // DATA READ, CLOSE FILE
     fclose(processes_file);
+
+    fc_fs(process_queue);
     return 0;
 
 

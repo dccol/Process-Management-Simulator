@@ -15,4 +15,6 @@ typedef struct process {
 process_t *new_process();
 
 void populate_process_t(process_t *process, int i, char* data);
+
+void run_process(process_t *process);
 #endif
