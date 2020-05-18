@@ -14,8 +14,12 @@
 
 int main(int argc, char **argv) {
 
-    // INSTANTIATE QUEUE
+    // INSTANTIATE PENDING QUEUE
+    deque_t *pending_process_queue = new_deque();
+
+    // INSTANTIATE PROCESS QUEUE
     deque_t *process_queue = new_deque();
+
     // READ IN THE PROCESSES
     FILE *processes_file = fopen("../test/processes.txt", "r");
     char str[MAX_CHAR];
@@ -44,13 +48,13 @@ int main(int argc, char **argv) {
 
         data_t data;
         data.process = process;
-        deque_insert(process_queue, data);
+        deque_insert(pending_process_queue, data);
     }
 
     printf("\n");
 
     if(DEBUG == 1) {
-        node_t *curr = process_queue->foot;
+        node_t *curr = pending_process_queue->foot;
         while (curr != NULL) {
             printf("Process ID: %d\n", curr->data.process->pid);
             printf("Time Received: %d\n", curr->data.process->time_rec);
@@ -65,14 +69,14 @@ int main(int argc, char **argv) {
     fclose(processes_file);
 
     // SELECT SCHEDULE ALGORITHM
-    char *alg = "rr";
+    char *alg = "ff";
     int quantum = 10;
 
     if(strstr(alg, "rr")){
         rr(process_queue, quantum);
     }
     if(strstr(alg, "ff")) {
-        fc_fs(process_queue);
+        fc_fs(pending_process_queue, process_queue);
     }
     return 0;
 

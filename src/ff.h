@@ -4,8 +4,40 @@
 
 #include "deque.h"
 
-void fc_fs(deque_t *process_queue);
+/**
+ * The First-Come First-Served Scheduling Algorthim
+ * @param pending_process_queue
+ * @param process_queu
+ */
+void fc_fs(deque_t *pending_process_queue, deque_t *process_queue);
 
-void run_process_ff(process_t *process);
+/**
+ * Decrements a processes time remaining attribute
+ * @param process
+ * @return
+ */
+int run_process_ff(process_t *process);
+
+/**
+ * Abstraction of a unit of time in the simulation
+ * Running process time remaining will decrease
+ * if a process 'arrives' it is added to the process queue
+ * @param pending_process_queue
+ * @param process_queue
+ * @param current_process
+ * @param simulation_time_elapsed
+ * @param next_process_arrival_time
+ */
+int step(deque_t *pending_process_queue, deque_t *process_queue, process_t *current_process,
+        int simulation_time_elapsed, int next_process_arrival_time);
+
+/**
+ * Takes the first item in the pending queue and adds it to the process queue
+ * Returns the new pending process arrival time
+ * @param pending_process_queue
+ * @param process_queue
+ * @return
+ */
+int insert_pending(deque_t *pending_process_queue, deque_t *process_queue, int time);
 
 #endif
