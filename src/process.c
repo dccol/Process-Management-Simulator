@@ -4,19 +4,21 @@
 #include <assert.h>
 
 #include "process.h"
+#include "deque.h"
 
 
 process_t *new_process() {
     process_t *process;
     process = (process_t*)malloc(sizeof(*process));
     assert(process!=NULL);
-    process->time_rec = (int)malloc(sizeof(int));
+    /*process->time_rec = (int)malloc(sizeof(int));
     process->pid = (int)malloc(sizeof(int));
     process->mem_req = (int)malloc(sizeof(int));
-    process->time_remaining = (int)malloc(sizeof(int));
+    process->time_remaining = (int)malloc(sizeof(int));*/
 
     return process;
 }
+
 void populate_process_t(process_t *process, int i, char* data){
 
     int i_data = atoi(data);

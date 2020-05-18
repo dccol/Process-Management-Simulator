@@ -8,7 +8,7 @@
 #include "process.h"
 
 typedef struct data {
-    process_t process;
+    process_t *process;
 } data_t;
 
 typedef struct node node_t;

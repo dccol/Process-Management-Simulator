@@ -26,7 +26,7 @@ int main(int argc, char **argv) {
     while (fgets(str, MAX_CHAR, processes_file) != NULL) {
         printf("%s", str);
 
-        process_t *process;
+        process_t *process = new_process();
 
         // SPLIT INTO VARIABLES
         char *token = strtok(str, " ");
@@ -39,15 +39,10 @@ int main(int argc, char **argv) {
             i++;
         }
 
-        /*printf("Process ID: %d\n", process.pid);
-        printf("Time Received: %d\n", process.time_rec);
-        printf("Memory Requirement: %d\n", process.mem_req);
-        printf("Time Remaining: %d\n", process.time_remaining);
-        printf("\n");
-         */
-
         data_t data;
-        data.process = *process;
+
+        // idk about this
+        data.process = process;
         deque_insert(process_queue, data);
     }
 
@@ -56,10 +51,10 @@ int main(int argc, char **argv) {
     if(DEBUG == 1) {
         node_t *curr = process_queue->foot;
         while (curr != NULL) {
-            printf("Process ID: %d\n", curr->data.process.pid);
-            printf("Time Received: %d\n", curr->data.process.time_rec);
-            printf("Memory Requirement: %d\n", curr->data.process.mem_req);
-            printf("Time Remaining: %d\n", curr->data.process.time_remaining);
+            printf("Process ID: %d\n", curr->data.process->pid);
+            printf("Time Received: %d\n", curr->data.process->time_rec);
+            printf("Memory Requirement: %d\n", curr->data.process->mem_req);
+            printf("Time Remaining: %d\n", curr->data.process->time_remaining);
             printf("\n");
 
             curr = curr->prev;

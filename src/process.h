@@ -12,6 +12,7 @@ typedef struct process {
     int time_remaining;
 } process_t;
 
+process_t *new_process();
 
 void populate_process_t(process_t *process, int i, char* data);
 #endif
