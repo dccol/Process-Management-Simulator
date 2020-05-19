@@ -21,7 +21,7 @@ int main(int argc, char **argv) {
     deque_t *process_queue = new_deque();
 
     // READ IN THE PROCESSES
-    FILE *processes_file = fopen("../test/processes.txt", "r");
+    FILE *processes_file = fopen("../test/processes2.txt", "r");
     char str[MAX_CHAR];
     if(processes_file == NULL){
         printf("Could not open file\n");
@@ -69,7 +69,7 @@ int main(int argc, char **argv) {
     fclose(processes_file);
 
     // SELECT SCHEDULE ALGORITHM
-    char *alg = "rr";
+    char *alg = "ff";
     int quantum = 10;
 
     if(strstr(alg, "rr")){

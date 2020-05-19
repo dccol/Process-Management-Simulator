@@ -4,6 +4,7 @@
 
 #include "deque.h"
 #include "process.h"
+#include "sort.h"
 
 /**
  * The First-Come First-Served Scheduling Algorithm
@@ -41,5 +42,7 @@ int step_ff(deque_t *pending_process_queue, deque_t *process_queue, process_t *c
  * @return
  */
 int insert_pending_ff(deque_t *pending_process_queue, deque_t *process_queue, int time);
+
+void check_pending(deque_t *pending_process_queue, deque_t *process_queue, int simulation_time);
 
 #endif
