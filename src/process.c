@@ -35,3 +35,4 @@ void populate_process_t(process_t *process, int i, char* data){
         process->time_remaining = i_data;
     }
 }
+

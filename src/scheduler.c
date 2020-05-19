@@ -8,7 +8,7 @@
 #include "ff.h"
 #include "rr.h"
 
-#define DEBUG 1
+#define DEBUG 0
 
 #define MAX_CHAR 1000
 
@@ -30,7 +30,7 @@ int main(int argc, char **argv) {
 
     // READ BY LINE
     while (fgets(str, MAX_CHAR, processes_file) != NULL) {
-        printf("%s", str);
+        //printf("%s", str);
 
         process_t *process = new_process();
 
@@ -69,7 +69,7 @@ int main(int argc, char **argv) {
     fclose(processes_file);
 
     // SELECT SCHEDULE ALGORITHM
-    char *alg = "ff";
+    char *alg = "rr";
     int quantum = 10;
 
     if(strstr(alg, "rr")){
@@ -78,6 +78,8 @@ int main(int argc, char **argv) {
     if(strstr(alg, "ff")) {
         fc_fs(pending_process_queue, process_queue);
     }
+    free_deque(pending_process_queue);
+    free_deque(process_queue);
     return 0;
 
 

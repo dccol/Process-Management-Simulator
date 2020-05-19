@@ -30,16 +30,16 @@ int run_process_ff(process_t *process);
  * @param next_process_arrival_time
  * @return
  */
-int step(deque_t *pending_process_queue, deque_t *process_queue, process_t *current_process,
+int step_ff(deque_t *pending_process_queue, deque_t *process_queue, process_t *current_process,
         int simulation_time_elapsed, int next_process_arrival_time);
 
 /**
  * Takes the first item in the pending queue and adds it to the process queue to simulate the arrival of a new process
- * Returns the new pending process arrival time
+ * Returns the new pending process arrival time, derived from the process now at the front on the pending queue
  * @param pending_process_queue
  * @param process_queue
  * @return
  */
-int insert_pending(deque_t *pending_process_queue, deque_t *process_queue, int time);
+int insert_pending_ff(deque_t *pending_process_queue, deque_t *process_queue, int time);
 
 #endif
