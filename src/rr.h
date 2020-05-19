@@ -3,6 +3,7 @@
 #define RR_H
 
 #include "deque.h"
+#include "sort.h"
 
 /**
  * Round-Robin scheduling algorithm
@@ -42,5 +43,7 @@ int run_process_rr(process_t *process, int quantum);
  * @return
  */
 int insert_pending_rr(deque_t *pending_process_queue, deque_t *process_queue, int time);
+
+void check_pending_rr(deque_t *pending_process_queue, deque_t *process_queue, int simulation_time);
 
 #endif

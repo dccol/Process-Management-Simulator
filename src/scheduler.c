@@ -69,7 +69,7 @@ int main(int argc, char **argv) {
     fclose(processes_file);
 
     // SELECT SCHEDULE ALGORITHM
-    char *alg = "ff";
+    char *alg = "rr";
     int quantum = 10;
 
     if(strstr(alg, "rr")){
