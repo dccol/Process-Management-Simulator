@@ -11,7 +11,6 @@ void fc_fs(deque_t *pending_process_queue, deque_t *process_queue){
 
     // VARIABLES
     int simulation_time_elapsed = 0;
-    int next_process_arrival_time = pending_process_queue->foot->data.process->time_rec;
 
     //printf("Next Process will arrive at %d\n", next_process_arrival_time);
 
@@ -43,7 +42,7 @@ void fc_fs(deque_t *pending_process_queue, deque_t *process_queue){
             simulation_time_elapsed++;
 
             // Keep track of the next process arrival time
-            next_process_arrival_time = step_ff(pending_process_queue, process_queue, process, simulation_time_elapsed, next_process_arrival_time);
+            step_ff(pending_process_queue, process_queue, process, simulation_time_elapsed);
         }
     }
     printf("All Processes Complete\n");
@@ -52,8 +51,8 @@ void fc_fs(deque_t *pending_process_queue, deque_t *process_queue){
 /**
  * abstraction of a unit of time (second)
  */
-int step_ff(deque_t *pending_process_queue, deque_t *process_queue, process_t *current_process,
-        int simulation_time_elapsed, int next_process_arrival_time){
+void step_ff(deque_t *pending_process_queue, deque_t *process_queue, process_t *current_process,
+        int simulation_time_elapsed){
 
     int status = run_process_ff(current_process);
     if(status == DONE){
@@ -73,7 +72,6 @@ int step_ff(deque_t *pending_process_queue, deque_t *process_queue, process_t *c
     check_pending(pending_process_queue, process_queue, simulation_time_elapsed);
 
     //printf("%3d| RUNNING, id: %d, remaining-time: %d\n", simulation_time_elapsed, current_process->pid, current_process->time_remaining);
-    return next_process_arrival_time;
 }
 
 int run_process_ff(process_t *process){

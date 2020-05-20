@@ -24,8 +24,8 @@ void rr(deque_t *pending_process_queue, deque_t *process_queue, int quantum);
  * @param quantum
  * @return
  */
-int step_rr(deque_t *pending_process_queue, deque_t *process_queue, process_t *current_process,
-            int simulation_time_elapsed, int next_process_arrival_time, int quantum);
+void step_rr(deque_t *pending_process_queue, deque_t *process_queue, process_t *current_process,
+            int simulation_time_elapsed, int quantum);
 
 /**
  * DEcrements a processes time remaining attribute

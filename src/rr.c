@@ -11,7 +11,6 @@ void rr(deque_t *pending_process_queue, deque_t *process_queue, int quantum){
 
     // VARIABLES
     int simulation_time_elapsed = 0;
-    int next_process_arrival_time = pending_process_queue->foot->data.process->time_rec;
 
     //printf("Next Process will arrive at %d\n", next_process_arrival_time);
 
@@ -52,7 +51,7 @@ void rr(deque_t *pending_process_queue, deque_t *process_queue, int quantum){
             quantum_rr--;
 
             // Keep track of the next process arrival time
-            next_process_arrival_time = step_rr(pending_process_queue, process_queue, process, simulation_time_elapsed, next_process_arrival_time, quantum_rr);
+            step_rr(pending_process_queue, process_queue, process, simulation_time_elapsed, quantum_rr);
         }
     }
     printf("All Processes Complete\n");
@@ -61,8 +60,8 @@ void rr(deque_t *pending_process_queue, deque_t *process_queue, int quantum){
 /**
  * abstraction of a unit of time (second)
  */
-int step_rr(deque_t *pending_process_queue, deque_t *process_queue, process_t *current_process,
-         int simulation_time_elapsed, int next_process_arrival_time, int quantum_rr){
+void step_rr(deque_t *pending_process_queue, deque_t *process_queue, process_t *current_process,
+         int simulation_time_elapsed, int quantum_rr){
 
     // Status used to determine whether the process should be re-inserted into the process queue
     int status = run_process_rr(current_process, quantum_rr);
@@ -91,8 +90,6 @@ int step_rr(deque_t *pending_process_queue, deque_t *process_queue, process_t *c
     }*/
 
     check_pending_rr(pending_process_queue, process_queue, simulation_time_elapsed);
-
-    return next_process_arrival_time;
 }
 
 int run_process_rr(process_t *process, int quantum_rr){
