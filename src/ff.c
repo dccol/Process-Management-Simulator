@@ -1,4 +1,6 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include "string.h"
 #include "ff.h"
 
 #define NOT_DONE 1
@@ -107,7 +109,7 @@ void check_pending(deque_t *pending_process_queue, deque_t *process_queue, int s
 
     if(pending_process_queue->head != NULL) {
         // dynamically add memory in future
-        data_t processes_to_insert[10];
+        data_t *processes_to_insert = (data_t*)malloc(sizeof(*processes_to_insert) * 10);
         process_t *next_process_to_arrive = pending_process_queue->foot->data.process;
 
         int index = 0;
@@ -138,7 +140,6 @@ void check_pending(deque_t *pending_process_queue, deque_t *process_queue, int s
             printf("%3d, Process ID: %d\n", simulation_time, processes_to_insert[i].process->pid);
             deque_insert(process_queue, processes_to_insert[i]);
         }
+        free(processes_to_insert);
     }
-
-
 }

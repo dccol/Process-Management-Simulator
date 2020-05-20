@@ -11,6 +11,8 @@ typedef struct process {
     int pid;
     int mem_req;
     int time_remaining;
+    int time_started;
+
 } process_t;
 
 process_t *new_process();
