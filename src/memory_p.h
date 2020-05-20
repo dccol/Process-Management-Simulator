@@ -11,7 +11,7 @@
 
 #define PAGE_SIZE 4
 
-void swapping_x(int total_memory, process_t *process, deque_t *process_queue);
+void swapping_x(int *pages, int numPages, int space_available, int total_memory, process_t *process, deque_t *process_queue);
 
 void initialize_empty_pages(int *pages, int num_pages);
 

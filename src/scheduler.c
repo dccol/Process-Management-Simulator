@@ -82,7 +82,7 @@ int main(int argc, char **argv) {
         rr(pending_process_queue, process_queue, quantum);
     }
     else if(strstr(schedule_alg, "ff")) {
-        fc_fs(pending_process_queue, process_queue);
+        fc_fs(pending_process_queue, process_queue, memory_opt, memory_size);
     }
     free_deque(pending_process_queue);
     free_deque(process_queue);

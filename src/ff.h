@@ -13,7 +13,7 @@
  * @param pending_process_queue
  * @param process_queue
  */
-void fc_fs(deque_t *pending_process_queue, deque_t *process_queue);
+void fc_fs(deque_t *pending_process_queue, deque_t *process_queue, char *memory_opt, int memory_size);
 
 /**
  * Decrements a processes time remaining attribute

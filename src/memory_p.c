@@ -1,24 +1,14 @@
 
 #include "memory_p.h"
 
-void swapping_x(int total_memory, process_t *process, deque_t *process_queue){
+void swapping_x(int *pages, int num_pages, int space_available, int total_memory, process_t *process, deque_t *process_queue){
 
-    int num_pages = total_memory/PAGE_SIZE;
-
-    // initialize RAM pages
-    int *pages = (int*)malloc(sizeof(*pages) * num_pages);
-
-    int space_available = num_pages;
-
-    initialize_empty_pages(pages, num_pages);
-
-    // pages remaining
+    // Pages remaining to load
     int process_pages_req = process->mem_req / PAGE_SIZE;
 
-    // load the pages into memory
+    // Load the pages into memory
     load_pages(pages, num_pages, space_available, process, process_pages_req, process_queue);
 
-    free(pages);
 }
 
 void initialize_empty_pages(int *pages, int num_pages){

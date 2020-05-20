@@ -7,10 +7,31 @@
 #define DONE 2
 
 
-void fc_fs(deque_t *pending_process_queue, deque_t *process_queue){
+void fc_fs(deque_t *pending_process_queue, deque_t *process_queue, char *memory_opt, int memory_size){
 
     // VARIABLES
     int simulation_time_elapsed = 0;
+
+    // MEMORY VARIABLES
+    int num_pages = -1;
+    int *pages = NULL;
+    int space_available = -1;
+
+    /**
+     * If the Memory option is not unlimited, initialize the memory data structure
+     */
+    if(!strstr(memory_opt, "u")){
+
+        // INITIALISE MEMORY
+        num_pages = memory_size/PAGE_SIZE;
+
+        // initialize RAM pages
+        pages = (int*)malloc(sizeof(*pages) * num_pages);
+
+        space_available = num_pages;
+
+        initialize_empty_pages(pages, num_pages);
+    }
 
     // If a process has been received at time 0 insert it into the process queue (transfer from pending queue)
     check_pending(pending_process_queue, process_queue, simulation_time_elapsed);
@@ -23,11 +44,19 @@ void fc_fs(deque_t *pending_process_queue, deque_t *process_queue){
         data_t data = deque_remove(process_queue);
         process_t *process = data.process;
 
-        // If -m tag != u
         /**
-         * Load the processes pages into memory using Swapping-X
+         * If memory option not unlimited
          */
-        //swapping_x(total_memory, process, process_queue);
+        if(strstr(memory_opt, "p")) {
+
+            /**
+             * Load the processes pages into memory using Swapping-X
+             */
+            swapping_x(pages, num_pages, space_available, memory_size, process, process_queue);
+        }
+        else if(strstr(memory_opt, "v")){
+            // virtual memory
+        }
 
         printf("%3d, RUNNING, id: %d, remaining-time: %d\n", simulation_time_elapsed, process->pid, process->time_remaining);
 
@@ -41,6 +70,7 @@ void fc_fs(deque_t *pending_process_queue, deque_t *process_queue){
         }
     }
     printf("All Processes Complete\n");
+    free(pages);
 }
 
 /**
@@ -49,15 +79,22 @@ void fc_fs(deque_t *pending_process_queue, deque_t *process_queue){
 void step_ff(deque_t *pending_process_queue, deque_t *process_queue, process_t *current_process,
         int simulation_time_elapsed){
 
+    /*if(state == "LOADING"){
+
+    }*/
+    //else if(state == "RUNNING") {
+
     int status = run_process_ff(current_process);
-    if(status == DONE){
-        printf("%3d, FINISHED, id: %d, proc-remaining: %d\n", simulation_time_elapsed, current_process->pid, process_queue->size);
+    if (status == DONE) {
+        printf("%3d, FINISHED, id: %d, proc-remaining: %d\n", simulation_time_elapsed, current_process->pid,
+               process_queue->size);
     }
 
     // If a process has been received at current simulation time, insert it into the process queue (transfer from pending queue)
     check_pending(pending_process_queue, process_queue, simulation_time_elapsed);
 
     //printf("%3d| RUNNING, id: %d, remaining-time: %d\n", simulation_time_elapsed, current_process->pid, current_process->time_remaining);
+    //}
 }
 
 int run_process_ff(process_t *process){
