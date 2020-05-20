@@ -12,27 +12,22 @@ void fc_fs(deque_t *pending_process_queue, deque_t *process_queue){
     // VARIABLES
     int simulation_time_elapsed = 0;
 
-    //printf("Next Process will arrive at %d\n", next_process_arrival_time);
-
-    /* If a process has been received insert it into the process queue (transfer from pending queue)
-     * Inserting the first process received at time = 0
-     * */
-    /*if(simulation_time_elapsed == next_process_arrival_time){
-
-        // Update the time of the next process arrival
-        next_process_arrival_time = insert_pending_ff(pending_process_queue, process_queue, simulation_time_elapsed);
-        //printf("Next Process will arrive at %d\n", next_process_arrival_time);
-    }*/
+    // If a process has been received at time 0 insert it into the process queue (transfer from pending queue)
     check_pending(pending_process_queue, process_queue, simulation_time_elapsed);
 
     /**
      * While there are processes in the process queue, step the simulation
      */
-
     while(process_queue->head != NULL){
 
         data_t data = deque_remove(process_queue);
         process_t *process = data.process;
+
+        // If -m tag != u
+        /**
+         * Load the processes pages into memory using Swapping-X
+         */
+        //swapping_x(total_memory, process, process_queue);
 
         printf("%3d, RUNNING, id: %d, remaining-time: %d\n", simulation_time_elapsed, process->pid, process->time_remaining);
 
@@ -59,16 +54,7 @@ void step_ff(deque_t *pending_process_queue, deque_t *process_queue, process_t *
         printf("%3d, FINISHED, id: %d, proc-remaining: %d\n", simulation_time_elapsed, current_process->pid, process_queue->size);
     }
 
-    /* if we have reach a time where a process would have arrived, simulate its arrival by removing it from the
-     * pending queue and inserting it into the process queue
-     */
-    /*if(simulation_time_elapsed == next_process_arrival_time){
-
-        // update the time of the next process arrival
-        next_process_arrival_time = insert_pending_ff(pending_process_queue, process_queue, simulation_time_elapsed);
-        //printf("Next Process will arrive at %d\n", next_process_arrival_time);
-    }*/
-
+    // If a process has been received at current simulation time, insert it into the process queue (transfer from pending queue)
     check_pending(pending_process_queue, process_queue, simulation_time_elapsed);
 
     //printf("%3d| RUNNING, id: %d, remaining-time: %d\n", simulation_time_elapsed, current_process->pid, current_process->time_remaining);
@@ -106,7 +92,8 @@ int insert_pending_ff(deque_t *pending_process_queue, deque_t *process_queue, in
 void check_pending(deque_t *pending_process_queue, deque_t *process_queue, int simulation_time){
 
     if(pending_process_queue->head != NULL) {
-        // dynamically add memory in future
+
+        // dynamically add memory in future , realloc?
         data_t *processes_to_insert = (data_t*)malloc(sizeof(*processes_to_insert) * 10);
         process_t *next_process_to_arrive = pending_process_queue->foot->data.process;
 
