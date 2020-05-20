@@ -65,7 +65,7 @@ void swap_pages(int *pages, int num_pages, int space_available, process_t *proce
     node_t *curr = process_queue->foot;
     while (curr != NULL) {
 
-        if (curr->data.process->time_started != NULL) {
+        if (curr->data.process->time_started != -1) {
 
             least_recent_process = process_queue->foot->data.process;
             break;
@@ -74,7 +74,7 @@ void swap_pages(int *pages, int num_pages, int space_available, process_t *proce
         }
     }
     // discard its pages from memory
-    space_available = discard_pages(pages, num_pages, space_available, least_recent_process, pages_remaining, process_queue);
+    space_available = discard_pages(pages, num_pages, space_available, least_recent_process);
 
     /**
      * If we return from this and there is still not enough space we will continue back tracking in the queue to find
@@ -87,7 +87,7 @@ void swap_pages(int *pages, int num_pages, int space_available, process_t *proce
         curr = curr->prev;
         while (curr != NULL) {
 
-            if (curr->data.process->time_started != NULL) {
+            if (curr->data.process->time_started != -1) {
 
                 least_recent_process = process_queue->foot->data.process;
             } else { // if the process at the front of the queue has not yet been executed, there is no memory to replace
@@ -96,7 +96,7 @@ void swap_pages(int *pages, int num_pages, int space_available, process_t *proce
         }
 
         // discard its pages from memory
-        space_available = discard_pages(pages, num_pages, space_available, least_recent_process, pages_remaining, process_queue);
+        space_available = discard_pages(pages, num_pages, space_available, least_recent_process);
     }
 
     /**
