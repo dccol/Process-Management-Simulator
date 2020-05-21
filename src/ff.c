@@ -190,7 +190,13 @@ void step_ff(deque_t *pending_process_queue, deque_t *process_queue, process_t *
             /**
              * PRINT TO STDOUT
              */
-            int mem_usage = round_up(((double)num_pages - (double)*space_available) / (double)num_pages * 100);
+            double mem_usage = ((double)num_pages - (double)*space_available) / (double)num_pages * 100;
+            if((mem_usage - (int)mem_usage) != 0){
+                mem_usage = round_up(mem_usage);
+            }
+            else{
+                mem_usage = (int)mem_usage;
+            }
 
             int num_process_pages = current_process->mem_req / PAGE_SIZE;
 
@@ -198,7 +204,7 @@ void step_ff(deque_t *pending_process_queue, deque_t *process_queue, process_t *
             find_process_mem(pages, num_pages, current_process, mem_addresses);
 
             // Print
-            printf("%d, RUNNING, id=%d, remaining-time=%d, load-time=%d, mem-usage=%d%%, mem-addresses=[",
+            printf("%d, RUNNING, id=%d, remaining-time=%d, load-time=%d, mem-usage=%2.0lf%%, mem-addresses=[",
                    *simulation_time_elapsed, current_process->pid, current_process->time_remaining, *loading_cost, mem_usage);
             for(int i = 0; i < num_process_pages -1 ; i++){
                 printf("%d,", mem_addresses[i]);
