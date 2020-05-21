@@ -88,6 +88,12 @@ void fc_fs(deque_t *pending_process_queue, deque_t *process_queue, char *memory_
             // if state running => proceed as normal
             step_ff(pending_process_queue, process_queue, process, &simulation_time_elapsed, pages, num_pages,
                     space_available, memory_opt, &state, &loaded, &loading_cost);
+
+            if(process->time_remaining == 0){
+                printf("%3d, FINISHED, id: %d, remaining-time %d, proc-remaining: %d\n", simulation_time_elapsed,
+                       process->pid, process->time_remaining, process_queue->size);
+            }
+
         }
     }
     printf("All Processes Complete\n");
@@ -145,8 +151,8 @@ int step_ff(deque_t *pending_process_queue, deque_t *process_queue, process_t *c
          * If the process is done
          */
         if (status == DONE) {
-            printf("%3d, FINISHED, id: %d, remaining-time %d, proc-remaining: %d\n", *simulation_time_elapsed,
-                    current_process->pid, current_process->time_remaining, process_queue->size);
+            /*printf("%3d, FINISHED, id: %d, remaining-time %d, proc-remaining: %d\n", *simulation_time_elapsed,
+                    current_process->pid, current_process->time_remaining, process_queue->size);*/
             /**
              * IF NOT USING UNLIMITED MEMORY REMOVE PROCESS FROM MEMORY
              */
