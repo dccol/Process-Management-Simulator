@@ -243,7 +243,7 @@ void step_ff(deque_t *pending_process_queue, deque_t *process_queue, process_t *
      * If WAITING => DO NOTHING, but check incoming process' and tick time
      */
     else if(*state == WAITING){
-        printf("%d, WAITING\n", *simulation_time_elapsed);
+        fprintf(stderr, "%d, WAITING\n", *simulation_time_elapsed);
     }
 
     *simulation_time_elapsed = *simulation_time_elapsed + 1;
