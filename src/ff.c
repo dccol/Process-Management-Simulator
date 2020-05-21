@@ -6,11 +6,15 @@
 #define NOT_DONE 1
 #define DONE 2
 
+/**
+ * STATES
+ */
 #define LOADING 3
 #define RUNNING 4
+#define WAITING 5
 
-#define LOADED 5
-#define NOT_LOADED 6
+#define LOADED 6
+#define NOT_LOADED 7
 
 
 void fc_fs(deque_t *pending_process_queue, deque_t *process_queue, char *memory_opt, int memory_size){
@@ -50,80 +54,94 @@ void fc_fs(deque_t *pending_process_queue, deque_t *process_queue, char *memory_
     check_pending(pending_process_queue, process_queue, simulation_time_elapsed);
 
     /**
-     * While there are processes in the process queue, step the simulation
+     * While there are processes in the process queue, step the simulation (ALSO IF THERE ARE MORE IN THE PENDING QUEUE)
      */
-    while(process_queue->head != NULL){
-
-        data_t data = deque_remove(process_queue);
-        process_t *process = data.process;
+    while(process_queue->head != NULL || pending_process_queue->head != NULL){
 
         /**
-         * If memory option not unlimited
+         * If the process queue is empty, but more processes are scheduled to arrive, wait
          */
-        if(strstr(memory_opt, "p")) {
-
-            /**
-             * Set STATE to LOADING
-             */
-            state = LOADING;
-            loaded = NOT_LOADED;
-            loading_cost = (process->mem_req / PAGE_SIZE) * 2;
-            //printf("Loading time: %d\n", loading_cost);
-            /*printf("%3d, RUNNING, id: %d, remaining-time: %d, load-time: %d\n",
-                   simulation_time_elapsed, process->pid, process->time_remaining, loading_cost);*/
-        }
-        else if(strstr(memory_opt, "v")){
-            // virtual memory
+        if(process_queue->head == NULL){
+            state = WAITING;
         }
 
         /**
-         * Print output to stdout
+         * Otherwise proceed with the alg as normal
          */
-        if(strstr(memory_opt, "u")) {
-            printf("%d, RUNNING, id=%d, remaining-time=%d\n", simulation_time_elapsed, process->pid,
-                   process->time_remaining);
-        }
-
-
-        // While the process being ran has time remaining, step the simulation
-        while(process->time_remaining > 0) {
-
-            //simulation_time_elapsed++;
-
-            // also pass in a state
-            // if state is loading => load pages but simulation time increase by 2 not 1, then change state
-            // if state running => proceed as normal
-            step_ff(pending_process_queue, process_queue, process, &simulation_time_elapsed, pages, num_pages,
-                    &space_available, memory_opt, &state, &loaded, &loading_cost);
+        else {
+            data_t data = deque_remove(process_queue);
+            process_t *process = data.process;
 
             /**
-             * If the Process is finished => Print output
+             * If memory option not unlimited
              */
-            if(process->time_remaining == 0){
+            if (strstr(memory_opt, "p")) {
 
                 /**
-                 * IF NOT USING UNLIMITED MEMORY REMOVE PROCESS FROM MEMORY
+                 * Set STATE to LOADING
                  */
-                if (!strstr(memory_opt, "u")) {
-
-                    int num_process_pages = process->mem_req / PAGE_SIZE;
-                    int *mem_addresses = (int*)malloc(sizeof(*mem_addresses) * num_process_pages);
-                    find_process_mem(pages, num_pages, process, mem_addresses);
-
-                    // Print
-                    printf("%d, EVICTED, mem-addresses=[", simulation_time_elapsed);
-                    for(int i = 0; i < num_process_pages -1 ; i++){
-                        printf("%d,", mem_addresses[i]);
-                    }
-                    printf("%d]\n", mem_addresses[num_process_pages-1]);
-                    free(mem_addresses);
-
-                    discard_pages(pages, num_pages, &space_available, process);
-                }
-                printf("%d, FINISHED, id=%d, proc-remaining=%d\n", simulation_time_elapsed,
-                       process->pid, process_queue->size);
+                state = LOADING;
+                loaded = NOT_LOADED;
+                loading_cost = (process->mem_req / PAGE_SIZE) * 2;
+                //printf("Loading time: %d\n", loading_cost);
+                /*printf("%3d, RUNNING, id: %d, remaining-time: %d, load-time: %d\n",
+                       simulation_time_elapsed, process->pid, process->time_remaining, loading_cost);*/
+            } else if (strstr(memory_opt, "v")) {
+                // virtual memory
+            }
+            else{
+                state = RUNNING;
             }
 
+            /**
+             * Print output to stdout
+             */
+            if (strstr(memory_opt, "u")) {
+                printf("%d, RUNNING, id=%d, remaining-time=%d\n", simulation_time_elapsed, process->pid,
+                       process->time_remaining);
+            }
+
+
+            // While the process being ran has time remaining, step the simulation
+            while (process->time_remaining > 0) {
+
+                //simulation_time_elapsed++;
+
+                // also pass in a state
+                // if state is loading => load pages but simulation time increase by 2 not 1, then change state
+                // if state running => proceed as normal
+                step_ff(pending_process_queue, process_queue, process, &simulation_time_elapsed, pages, num_pages,
+                        &space_available, memory_opt, &state, &loaded, &loading_cost);
+
+                /**
+                 * If the Process is finished => Print output
+                 */
+                if (process->time_remaining == 0) {
+
+                    /**
+                     * IF NOT USING UNLIMITED MEMORY REMOVE PROCESS FROM MEMORY
+                     */
+                    if (!strstr(memory_opt, "u")) {
+
+                        int num_process_pages = process->mem_req / PAGE_SIZE;
+                        int *mem_addresses = (int *) malloc(sizeof(*mem_addresses) * num_process_pages);
+                        find_process_mem(pages, num_pages, process, mem_addresses);
+
+                        // Print
+                        printf("%d, EVICTED, mem-addresses=[", simulation_time_elapsed);
+                        for (int i = 0; i < num_process_pages - 1; i++) {
+                            printf("%d,", mem_addresses[i]);
+                        }
+                        printf("%d]\n", mem_addresses[num_process_pages - 1]);
+                        free(mem_addresses);
+
+                        discard_pages(pages, num_pages, &space_available, process);
+                    }
+                    printf("%d, FINISHED, id=%d, proc-remaining=%d\n", simulation_time_elapsed,
+                           process->pid, process_queue->size);
+                }
+
+            }
         }
     }
     printf("All Processes Complete\n");
@@ -136,6 +154,9 @@ void fc_fs(deque_t *pending_process_queue, deque_t *process_queue, char *memory_
 void step_ff(deque_t *pending_process_queue, deque_t *process_queue, process_t *current_process,
         int *simulation_time_elapsed, int *pages, int num_pages, int *space_available, char *memory_opt, int* state, int *loaded, int *loading_cost){
 
+    /**
+     * IF WAITING =>
+     */
 
     /**
      * IF LOADING => LOAD PROCESS PAGES INTO MEMORY
@@ -185,13 +206,11 @@ void step_ff(deque_t *pending_process_queue, deque_t *process_queue, process_t *
     }
 
     /**
-     * OTHERWISE RUN THE PROCESS
+     * IF RUNNING => RUN THE PROCESS
      */
     else if(*state == RUNNING) {
 
-        /**
-         * BEGIN RUNNING THE PROCESS
-         */
+        // THIS IS WRONG, move out of step
         current_process->time_started = *simulation_time_elapsed;
         //printf("Process %d beginning at time %d\n", current_process->pid, current_process->time_started);
         //fprintf(stderr, "%d, RUNNING, id=%d, remaining-time=%d\n", *simulation_time_elapsed, current_process->pid, current_process->time_remaining);
@@ -207,6 +226,12 @@ void step_ff(deque_t *pending_process_queue, deque_t *process_queue, process_t *
         }
     }
 
+    /**
+     * If WAITING => DO NOTHING, but check incoming process' and tick time
+     */
+    else if(*state == WAITING){
+
+    }
 
     /**
      * If a process has been received at current simulation time, insert it into the process queue (transfer from pending queue)
