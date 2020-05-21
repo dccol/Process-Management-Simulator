@@ -5,7 +5,7 @@ void swapping_x(int *pages, int num_pages, int space_available, process_t *proce
 
     // Pages remaining to load
     int process_pages_req = process->mem_req / PAGE_SIZE;
-    printf("Process %d needs %d pages of memory\n", process->pid, process_pages_req);
+    //printf("Process %d needs %d pages of memory\n", process->pid, process_pages_req);
 
     // Load the pages into memory
     load_pages(pages, num_pages, space_available, process, process_pages_req, process_queue);

@@ -68,9 +68,9 @@ void fc_fs(deque_t *pending_process_queue, deque_t *process_queue, char *memory_
             state = LOADING;
             loaded = NOT_LOADED;
             loading_cost = (process->mem_req / PAGE_SIZE) * 2;
-            printf("Loading time: %d\n", loading_cost);
-            printf("%3d, RUNNING, id: %d, remaining-time: %d, load-time: %d\n",
-                   simulation_time_elapsed, process->pid, process->time_remaining, loading_cost);
+            //printf("Loading time: %d\n", loading_cost);
+            /*printf("%3d, RUNNING, id: %d, remaining-time: %d, load-time: %d\n",
+                   simulation_time_elapsed, process->pid, process->time_remaining, loading_cost);*/
         }
         else if(strstr(memory_opt, "v")){
             // virtual memory
@@ -100,7 +100,6 @@ void fc_fs(deque_t *pending_process_queue, deque_t *process_queue, char *memory_
 int step_ff(deque_t *pending_process_queue, deque_t *process_queue, process_t *current_process,
         int *simulation_time_elapsed, int *pages, int num_pages, int space_available, char *memory_opt, int* state, int *loaded, int *loading_cost){
 
-    *simulation_time_elapsed = *simulation_time_elapsed + 1;
 
     /**
      * IF LOADING => LOAD PROCESS PAGES INTO MEMORY
@@ -162,6 +161,8 @@ int step_ff(deque_t *pending_process_queue, deque_t *process_queue, process_t *c
      * If a process has been received at current simulation time, insert it into the process queue (transfer from pending queue)
      */
     check_pending(pending_process_queue, process_queue, *simulation_time_elapsed);
+
+    *simulation_time_elapsed = *simulation_time_elapsed + 1;
 
     //printf("%3d| RUNNING, id: %d, remaining-time: %d\n", simulation_time_elapsed, current_process->pid, current_process->time_remaining);
     //}
