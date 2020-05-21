@@ -134,9 +134,7 @@ int step_ff(deque_t *pending_process_queue, deque_t *process_queue, process_t *c
              * PRINT TO STDOUT
              */
 
-            printf("space available %d\n", space_available);
             int mem_usage = (((double)num_pages - (double)space_available) / (double)num_pages) * 100;
-
 
             int num_process_pages = current_process->mem_req / PAGE_SIZE;
             int *mem_addresses = (int*)malloc(sizeof(*mem_addresses) * num_process_pages);
@@ -148,7 +146,7 @@ int step_ff(deque_t *pending_process_queue, deque_t *process_queue, process_t *c
             printf("%d, RUNNING, id=%d, remaining-time=%d, load-time=%d, mem-usage=%d%%, mem-addresses=[",
                    *simulation_time_elapsed, current_process->pid, current_process->time_remaining, *loading_cost, mem_usage);
             for(int i = 0; i < num_process_pages -1 ; i++){
-                printf("%d, ", mem_addresses[i]);
+                printf("%d,", mem_addresses[i]);
             }
             printf("%d]\n", mem_addresses[num_process_pages-1]);
 
