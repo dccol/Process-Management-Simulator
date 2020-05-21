@@ -63,6 +63,9 @@ void fc_fs(deque_t *pending_process_queue, deque_t *process_queue, char *memory_
          */
         if(process_queue->head == NULL){
             state = WAITING;
+            process_t *place_holder_process = new_process();
+            step_ff(pending_process_queue, process_queue, place_holder_process, &simulation_time_elapsed, pages, num_pages,
+                    &space_available, memory_opt, &state, &loaded, &loading_cost);
         }
 
         /**
@@ -230,7 +233,7 @@ void step_ff(deque_t *pending_process_queue, deque_t *process_queue, process_t *
      * If WAITING => DO NOTHING, but check incoming process' and tick time
      */
     else if(*state == WAITING){
-
+        //printf("%d\n", *simulation_time_elapsed);
     }
 
     /**
