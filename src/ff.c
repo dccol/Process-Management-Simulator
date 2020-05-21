@@ -190,7 +190,8 @@ void step_ff(deque_t *pending_process_queue, deque_t *process_queue, process_t *
             /**
              * PRINT TO STDOUT
              */
-            int mem_usage = (((double)num_pages - (double)*space_available) / (double)num_pages) * 100;
+            int mem_usage = round_up(((double)num_pages - (double)*space_available) / (double)num_pages * 100);
+
             int num_process_pages = current_process->mem_req / PAGE_SIZE;
 
             int *mem_addresses = (int*)malloc(sizeof(*mem_addresses) * num_process_pages);
