@@ -79,25 +79,7 @@ void fc_fs(deque_t *pending_process_queue, deque_t *process_queue, char *memory_
         /**
          * Print output to stdout
          */
-        if(!strstr(memory_opt, "u")){
-
-            int mem_usage = ((num_pages - space_available) / num_pages) * 100;
-
-            int num_process_pages = process->mem_req / PAGE_SIZE;
-            int *mem_addresses = (int*)malloc(sizeof(*mem_addresses) * num_process_pages);
-            for(int i = 0; i < num_pages; i++){
-                if(pages[i] == process->pid){
-                    mem_addresses[i] = i;
-                }
-            }
-            printf("%d, RUNNING, id=%d, remaining-time=%d, load-time=%d, mem-usage=%d, mem-addresses=[",
-                   simulation_time_elapsed, process->pid, process->time_remaining, loading_cost, mem_usage);
-            for(int i = 0; i < num_process_pages -1 ; i++){
-                printf("%d, ", mem_addresses[i]);
-            }
-            printf("%d]\n", mem_addresses[num_process_pages-1]);
-        }
-        else {
+        if(strstr(memory_opt, "u")) {
             printf("%d, RUNNING, id=%d, remaining-time=%d\n", simulation_time_elapsed, process->pid,
                    process->time_remaining);
         }
@@ -138,19 +120,23 @@ int step_ff(deque_t *pending_process_queue, deque_t *process_queue, process_t *c
     if(*state == LOADING){
 
         // decrement time takes to load
-        fprintf(stderr, "%d, RUNNING, id=%d, remaining-time=%d, load-time=%d\n",
-               *simulation_time_elapsed, current_process->pid, current_process->time_remaining, *loading_cost);
+        /*fprintf(stderr, "%d, RUNNING, id=%d, remaining-time=%d, load-time=%d\n",
+               *simulation_time_elapsed, current_process->pid, current_process->time_remaining, *loading_cost);*/
+
 
         // how long we stay in loaded is based on 2*num loaded pages
         if(*loaded != LOADED) {
 
-            swapping_x(pages, num_pages, space_available, current_process, process_queue);
+            swapping_x(pages, num_pages, &space_available, current_process, process_queue);
             *loaded = LOADED;
 
             /**
              * PRINT TO STDOUT
              */
-            int mem_usage = ((num_pages - space_available) / num_pages) * 100;
+
+            printf("space available %d\n", space_available);
+            int mem_usage = (((double)num_pages - (double)space_available) / (double)num_pages) * 100;
+
 
             int num_process_pages = current_process->mem_req / PAGE_SIZE;
             int *mem_addresses = (int*)malloc(sizeof(*mem_addresses) * num_process_pages);
@@ -159,7 +145,7 @@ int step_ff(deque_t *pending_process_queue, deque_t *process_queue, process_t *c
                     mem_addresses[i] = i;
                 }
             }
-            printf("%d, RUNNING, id=%d, remaining-time=%d, load-time=%d, mem-usage=%d, mem-addresses=[",
+            printf("%d, RUNNING, id=%d, remaining-time=%d, load-time=%d, mem-usage=%d%%, mem-addresses=[",
                    *simulation_time_elapsed, current_process->pid, current_process->time_remaining, *loading_cost, mem_usage);
             for(int i = 0; i < num_process_pages -1 ; i++){
                 printf("%d, ", mem_addresses[i]);
@@ -170,11 +156,12 @@ int step_ff(deque_t *pending_process_queue, deque_t *process_queue, process_t *c
         // if loading has been completed in the previous tick, tick until loading cost has been reached,
         // then change the state so that the next tick runs the process
         else{
-            if(*loading_cost == 0) {
+            if(*loading_cost == 1) {
                 *state = RUNNING;
-                fprintf(stderr, "LOADING COMPLETE\n");
+                //fprintf(stderr, "LOADING COMPLETE\n");
             }
         }
+
         *loading_cost = *loading_cost - 1;
     }
 
@@ -188,7 +175,7 @@ int step_ff(deque_t *pending_process_queue, deque_t *process_queue, process_t *c
          */
         current_process->time_started = *simulation_time_elapsed;
         //printf("Process %d beginning at time %d\n", current_process->pid, current_process->time_started);
-        fprintf(stderr, "%d, RUNNING, id=%d, remaining-time=%d\n", *simulation_time_elapsed, current_process->pid, current_process->time_remaining);
+        //fprintf(stderr, "%d, RUNNING, id=%d, remaining-time=%d\n", *simulation_time_elapsed, current_process->pid, current_process->time_remaining);
         int status = run_process_ff(current_process);
 
         //printf("%3d, RUNNING, id: %d, remaining-time: %d\n", *simulation_time_elapsed, current_process->pid, current_process->time_remaining);
@@ -202,7 +189,7 @@ int step_ff(deque_t *pending_process_queue, deque_t *process_queue, process_t *c
              * IF NOT USING UNLIMITED MEMORY REMOVE PROCESS FROM MEMORY
              */
             if (!strstr(memory_opt, "u")) {
-                space_available = discard_pages(pages, num_pages, space_available, current_process);
+                discard_pages(pages, num_pages, &space_available, current_process);
             }
         }
     }

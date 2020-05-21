@@ -1,7 +1,7 @@
 
 #include "memory_p.h"
 
-void swapping_x(int *pages, int num_pages, int space_available, process_t *process, deque_t *process_queue){
+void swapping_x(int *pages, int num_pages, int *space_available, process_t *process, deque_t *process_queue){
 
     // Pages remaining to load
     int process_pages_req = process->mem_req / PAGE_SIZE;
@@ -19,7 +19,7 @@ void initialize_empty_pages(int *pages, int num_pages){
     }
 }
 
-void load_pages(int *pages, int num_pages, int space_available, process_t *process, int pages_remaining, deque_t *process_queue) {
+void load_pages(int *pages, int num_pages, int *space_available, process_t *process, int pages_remaining, deque_t *process_queue) {
 
     //int process_pages_req = process->mem_req / PAGE_SIZE;
     //int pages_remaining = process_pages_req;
@@ -31,7 +31,7 @@ void load_pages(int *pages, int num_pages, int space_available, process_t *proce
 
             pages[i] = process->pid;
             pages_remaining--;
-            space_available--;
+            *space_available = *space_available-1;
             if(pages_remaining == 0){
                 break;
             }
@@ -44,7 +44,7 @@ void load_pages(int *pages, int num_pages, int space_available, process_t *proce
     }
 }
 
-void swap_pages(int *pages, int num_pages, int space_available, process_t *process, int pages_remaining, deque_t *process_queue){
+void swap_pages(int *pages, int num_pages, int *space_available, process_t *process, int pages_remaining, deque_t *process_queue){
 
     // find the process least recently executed and replace its pages
     // how to find the process least recently executed?
@@ -71,14 +71,14 @@ void swap_pages(int *pages, int num_pages, int space_available, process_t *proce
         }
     }
     // discard its pages from memory
-    space_available = discard_pages(pages, num_pages, space_available, least_recent_process);
+    discard_pages(pages, num_pages, space_available, least_recent_process);
     print_memory(pages, num_pages);
 
     /**
      * If we return from this and there is still not enough space we will continue back tracking in the queue to find
      * the next least recently executed process and remove it's pages also
      */
-    while(pages_remaining > space_available) {
+    while(pages_remaining > *space_available) {
 
         // determine the least recently executed process
         assert(curr != NULL);
@@ -94,7 +94,7 @@ void swap_pages(int *pages, int num_pages, int space_available, process_t *proce
         }
 
         // discard its pages from memory
-        space_available = discard_pages(pages, num_pages, space_available, least_recent_process);
+        discard_pages(pages, num_pages, space_available, least_recent_process);
     }
     free(least_recent_process);
 
@@ -120,7 +120,7 @@ void swap_pages(int *pages, int num_pages, int space_available, process_t *proce
     }*/
 }
 
-int discard_pages(int *pages, int num_pages, int space_available, process_t *process){
+void discard_pages(int *pages, int num_pages, int *space_available, process_t *process){
     /**
      * DISCARD
      */
@@ -128,11 +128,9 @@ int discard_pages(int *pages, int num_pages, int space_available, process_t *pro
     for(int i = 0; i < num_pages; i++){
         if(pages[i] == process->pid){
             pages[i] = -1;
-            space_available++;
+            *space_available = *space_available+1;
         }
     }
-
-    return space_available;
 }
 
 void print_memory(int *pages, int num_pages){
