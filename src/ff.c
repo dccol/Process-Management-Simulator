@@ -96,7 +96,30 @@ void fc_fs(deque_t *pending_process_queue, deque_t *process_queue, char *memory_
             step_ff(pending_process_queue, process_queue, process, &simulation_time_elapsed, pages, num_pages,
                     space_available, memory_opt, &state, &loaded, &loading_cost);
 
+            /**
+             * If the Process is finished => Print output
+             */
             if(process->time_remaining == 0){
+
+                /**
+                 * IF NOT USING UNLIMITED MEMORY REMOVE PROCESS FROM MEMORY
+                 */
+                if (!strstr(memory_opt, "u")) {
+
+                    int num_process_pages = process->mem_req / PAGE_SIZE;
+                    int *mem_addresses = (int*)malloc(sizeof(*mem_addresses) * num_process_pages);
+                    find_process_mem(pages, num_pages, process, mem_addresses);
+
+                    // Print
+                    printf("%d, EVICTED, id=%d, mem-addresses=[",
+                           simulation_time_elapsed, process->pid);
+                    for(int i = 0; i < num_process_pages -1 ; i++){
+                        printf("%d,", mem_addresses[i]);
+                    }
+                    printf("%d]\n", mem_addresses[num_process_pages-1]);
+                    free(mem_addresses);
+                    discard_pages(pages, num_pages, &space_available, process);
+                }
                 printf("%d, FINISHED, id=%d, proc-remaining=%d\n", simulation_time_elapsed,
                        process->pid, process_queue->size);
             }
@@ -135,20 +158,19 @@ int step_ff(deque_t *pending_process_queue, deque_t *process_queue, process_t *c
              */
 
             int mem_usage = (((double)num_pages - (double)space_available) / (double)num_pages) * 100;
-
             int num_process_pages = current_process->mem_req / PAGE_SIZE;
+
             int *mem_addresses = (int*)malloc(sizeof(*mem_addresses) * num_process_pages);
-            for(int i = 0; i < num_pages; i++){
-                if(pages[i] == current_process->pid){
-                    mem_addresses[i] = i;
-                }
-            }
+            find_process_mem(pages, num_pages, current_process, mem_addresses);
+
+            // Print
             printf("%d, RUNNING, id=%d, remaining-time=%d, load-time=%d, mem-usage=%d%%, mem-addresses=[",
                    *simulation_time_elapsed, current_process->pid, current_process->time_remaining, *loading_cost, mem_usage);
             for(int i = 0; i < num_process_pages -1 ; i++){
                 printf("%d,", mem_addresses[i]);
             }
             printf("%d]\n", mem_addresses[num_process_pages-1]);
+            free(mem_addresses);
 
         }
         // if loading has been completed in the previous tick, tick until loading cost has been reached,
@@ -183,12 +205,7 @@ int step_ff(deque_t *pending_process_queue, deque_t *process_queue, process_t *c
         if (status == DONE) {
             /*printf("%3d, FINISHED, id: %d, remaining-time %d, proc-remaining: %d\n", *simulation_time_elapsed,
                     current_process->pid, current_process->time_remaining, process_queue->size);*/
-            /**
-             * IF NOT USING UNLIMITED MEMORY REMOVE PROCESS FROM MEMORY
-             */
-            if (!strstr(memory_opt, "u")) {
-                discard_pages(pages, num_pages, &space_available, current_process);
-            }
+
         }
     }
 

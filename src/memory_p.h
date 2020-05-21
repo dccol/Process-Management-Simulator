@@ -22,4 +22,6 @@ void swap_pages(int *pages, int num_pages, int *space_available, process_t *proc
 void discard_pages(int *pages, int num_pages, int *space_available, process_t *least_recent_process);
 
 void print_memory(int *pages, int num_pages);
+
+void find_process_mem(int *pages, int num_pages, process_t *process, int *mem_addresses);
 #endif

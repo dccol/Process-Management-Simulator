@@ -138,5 +138,12 @@ void print_memory(int *pages, int num_pages){
         //printf("Page %2d: %2d\n", i, pages[i]);
     }
 }
+void find_process_mem(int *pages, int num_pages, process_t *process, int *mem_addresses) {
+    for(int i = 0; i < num_pages; i++){
+        if(pages[i] == process->pid){
+            mem_addresses[i] = i;
+        }
+    }
+}
 
 
