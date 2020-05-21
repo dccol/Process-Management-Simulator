@@ -106,8 +106,6 @@ void fc_fs(deque_t *pending_process_queue, deque_t *process_queue, char *memory_
                  */
                 if (!strstr(memory_opt, "u")) {
 
-                    discard_pages(pages, num_pages, &space_available, process);
-
                     int num_process_pages = process->mem_req / PAGE_SIZE;
                     int *mem_addresses = (int*)malloc(sizeof(*mem_addresses) * num_process_pages);
                     find_process_mem(pages, num_pages, process, mem_addresses);
