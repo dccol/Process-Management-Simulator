@@ -314,7 +314,7 @@ void check_pending(deque_t *pending_process_queue, deque_t *process_queue, int s
         insertion_sort(processes_to_insert, index);
 
         for (int i = 0; i < index; i++) {
-            printf("%3d, Process ID: %d arrived\n", simulation_time, processes_to_insert[i].process->pid);
+            //printf("%3d, Process ID: %d arrived\n", simulation_time, processes_to_insert[i].process->pid);
             deque_insert(process_queue, processes_to_insert[i]);
         }
         free(processes_to_insert);
