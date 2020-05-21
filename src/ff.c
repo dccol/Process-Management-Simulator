@@ -111,8 +111,7 @@ void fc_fs(deque_t *pending_process_queue, deque_t *process_queue, char *memory_
                     find_process_mem(pages, num_pages, process, mem_addresses);
 
                     // Print
-                    printf("%d, EVICTED, id=%d, mem-addresses=[",
-                           simulation_time_elapsed, process->pid);
+                    printf("%d, EVICTED, mem-addresses=[", simulation_time_elapsed);
                     for(int i = 0; i < num_process_pages -1 ; i++){
                         printf("%d,", mem_addresses[i]);
                     }
