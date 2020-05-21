@@ -57,6 +57,8 @@ void fc_fs(deque_t *pending_process_queue, deque_t *process_queue, char *memory_
         data_t data = deque_remove(process_queue);
         process_t *process = data.process;
 
+        printf("%d, RUNNING, id=%d, remaining-time=%d\n", simulation_time_elapsed, process->pid, process->time_remaining);
+
         /**
          * If memory option not unlimited
          */
@@ -90,8 +92,8 @@ void fc_fs(deque_t *pending_process_queue, deque_t *process_queue, char *memory_
                     space_available, memory_opt, &state, &loaded, &loading_cost);
 
             if(process->time_remaining == 0){
-                printf("%3d, FINISHED, id: %d, remaining-time %d, proc-remaining: %d\n", simulation_time_elapsed,
-                       process->pid, process->time_remaining, process_queue->size);
+                printf("%d, FINISHED, id=%d, proc-remaining=%d\n", simulation_time_elapsed,
+                       process->pid, process_queue->size);
             }
 
         }
@@ -113,7 +115,7 @@ int step_ff(deque_t *pending_process_queue, deque_t *process_queue, process_t *c
     if(*state == LOADING){
 
         // decrement time takes to load
-        printf("%3d, RUNNING, id: %d, remaining-time: %d, load-time: %d\n",
+        fprintf(stderr, "%d, RUNNING, id=%d, remaining-time=%d, load-time=%d\n",
                *simulation_time_elapsed, current_process->pid, current_process->time_remaining, *loading_cost);
         *loading_cost = *loading_cost - 1;
 
@@ -128,7 +130,7 @@ int step_ff(deque_t *pending_process_queue, deque_t *process_queue, process_t *c
         else{
             if(*loading_cost == 0) {
                 *state = RUNNING;
-                printf("LOADING COMPLETE\n");
+                fprintf(stderr, "LOADING COMPLETE\n");
             }
         }
     }
@@ -143,7 +145,7 @@ int step_ff(deque_t *pending_process_queue, deque_t *process_queue, process_t *c
          */
         current_process->time_started = *simulation_time_elapsed;
         //printf("Process %d beginning at time %d\n", current_process->pid, current_process->time_started);
-        printf("%3d, RUNNING, id: %d, remaining-time: %d\n", *simulation_time_elapsed, current_process->pid, current_process->time_remaining);
+        fprintf(stderr, "%d, RUNNING, id=%d, remaining-time=%d\n", *simulation_time_elapsed, current_process->pid, current_process->time_remaining);
         int status = run_process_ff(current_process);
 
         //printf("%3d, RUNNING, id: %d, remaining-time: %d\n", *simulation_time_elapsed, current_process->pid, current_process->time_remaining);
