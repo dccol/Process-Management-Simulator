@@ -59,11 +59,19 @@ void fc_fs(deque_t *pending_process_queue, deque_t *process_queue, char *memory_
     while(process_queue->head != NULL || pending_process_queue->head != NULL){
 
         /**
+         * Check whether any new processes have arrived before entering waiting step
+         */
+        check_pending(pending_process_queue, process_queue, simulation_time_elapsed);
+
+        /**
          * If the process queue is empty, but more processes are scheduled to arrive, wait
          */
         if(process_queue->head == NULL){
             state = WAITING;
             process_t *place_holder_process = new_process();
+
+
+
             step_ff(pending_process_queue, process_queue, place_holder_process, &simulation_time_elapsed, pages, num_pages,
                     &space_available, memory_opt, &state, &loaded, &loading_cost);
         }
@@ -113,6 +121,10 @@ void fc_fs(deque_t *pending_process_queue, deque_t *process_queue, char *memory_
                 // also pass in a state
                 // if state is loading => load pages but simulation time increase by 2 not 1, then change state
                 // if state running => proceed as normal
+                /**
+                 * If a process has been received at current simulation time, insert it into the process queue (transfer from pending queue)
+                 */
+                check_pending(pending_process_queue, process_queue, simulation_time_elapsed);
                 step_ff(pending_process_queue, process_queue, process, &simulation_time_elapsed, pages, num_pages,
                         &space_available, memory_opt, &state, &loaded, &loading_cost);
 
@@ -157,9 +169,7 @@ void fc_fs(deque_t *pending_process_queue, deque_t *process_queue, char *memory_
 void step_ff(deque_t *pending_process_queue, deque_t *process_queue, process_t *current_process,
         int *simulation_time_elapsed, int *pages, int num_pages, int *space_available, char *memory_opt, int* state, int *loaded, int *loading_cost){
 
-    /**
-     * IF WAITING =>
-     */
+
 
     /**
      * IF LOADING => LOAD PROCESS PAGES INTO MEMORY
@@ -167,8 +177,8 @@ void step_ff(deque_t *pending_process_queue, deque_t *process_queue, process_t *
     if(*state == LOADING){
 
         // decrement time takes to load
-        /*fprintf(stderr, "%d, RUNNING, id=%d, remaining-time=%d, load-time=%d\n",
-               *simulation_time_elapsed, current_process->pid, current_process->time_remaining, *loading_cost);*/
+        fprintf(stderr, "%d, RUNNING, id=%d, remaining-time=%d, load-time=%d\n",
+               *simulation_time_elapsed, current_process->pid, current_process->time_remaining, *loading_cost);
 
 
         // how long we stay in loaded is based on 2*num loaded pages
@@ -216,7 +226,7 @@ void step_ff(deque_t *pending_process_queue, deque_t *process_queue, process_t *
         // THIS IS WRONG, move out of step
         current_process->time_started = *simulation_time_elapsed;
         //printf("Process %d beginning at time %d\n", current_process->pid, current_process->time_started);
-        //fprintf(stderr, "%d, RUNNING, id=%d, remaining-time=%d\n", *simulation_time_elapsed, current_process->pid, current_process->time_remaining);
+        fprintf(stderr, "%d, RUNNING, id=%d, remaining-time=%d\n", *simulation_time_elapsed, current_process->pid, current_process->time_remaining);
         int status = run_process_ff(current_process);
 
         //printf("%3d, RUNNING, id: %d, remaining-time: %d\n", *simulation_time_elapsed, current_process->pid, current_process->time_remaining);
@@ -233,13 +243,8 @@ void step_ff(deque_t *pending_process_queue, deque_t *process_queue, process_t *
      * If WAITING => DO NOTHING, but check incoming process' and tick time
      */
     else if(*state == WAITING){
-        //printf("%d\n", *simulation_time_elapsed);
+        printf("%d, WAITING\n", *simulation_time_elapsed);
     }
-
-    /**
-     * If a process has been received at current simulation time, insert it into the process queue (transfer from pending queue)
-     */
-    check_pending(pending_process_queue, process_queue, *simulation_time_elapsed);
 
     *simulation_time_elapsed = *simulation_time_elapsed + 1;
 
@@ -309,7 +314,7 @@ void check_pending(deque_t *pending_process_queue, deque_t *process_queue, int s
         insertion_sort(processes_to_insert, index);
 
         for (int i = 0; i < index; i++) {
-            //printf("%3d, Process ID: %d\n", simulation_time, processes_to_insert[i].process->pid);
+            printf("%3d, Process ID: %d arrived\n", simulation_time, processes_to_insert[i].process->pid);
             deque_insert(process_queue, processes_to_insert[i]);
         }
         free(processes_to_insert);
