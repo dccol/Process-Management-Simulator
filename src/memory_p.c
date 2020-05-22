@@ -162,9 +162,15 @@ void print_memory(int *pages, int num_pages){
     }
 }
 void find_process_mem(int *pages, int num_pages, process_t *process, int *mem_addresses) {
+
+    int index = 0;
     for(int i = 0; i < num_pages; i++){
+
+        // if contains the id we are looking for, append to mem_addresses
         if(pages[i] == process->pid){
-            mem_addresses[i] = i;
+
+            mem_addresses[index] = i;
+            index++;
         }
     }
 }

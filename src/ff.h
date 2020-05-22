@@ -15,6 +15,10 @@
 #include "print_output.h"
 
 /**
+ * TEST THE FAILED TEST
+ */
+
+/**
  * The First-Come First-Served Scheduling Algorithm
  * @param pending_process_queue
  * @param process_queue
@@ -40,7 +44,7 @@ int run_process_ff(process_t *process);
  * @return
  */
 void step_ff(deque_t *process_queue, process_t *current_process, int *simulation_time_elapsed, int *pages,
-        int num_pages, int *space_available, int *state, int *loaded, int *loading_cost);
+        int num_pages, int *space_available, int *state, int *loading_cost);
 
 /**
  * Takes processes from pending queue and adds them to the process queue to simulate the arrival of a new process

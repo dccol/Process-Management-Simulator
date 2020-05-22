@@ -3,7 +3,7 @@
 
 void print_evicted(int *pages, int num_pages, process_t *process, int simulation_time_elapsed){
     int num_process_pages = process->mem_req / PAGE_SIZE;
-    int *mem_addresses = (int *) malloc(sizeof(*mem_addresses) * num_process_pages);
+    int *mem_addresses = (int *) malloc(sizeof(*mem_addresses) * (num_process_pages+1));
     find_process_mem(pages, num_pages, process, mem_addresses);
 
     // Print

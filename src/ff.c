@@ -11,9 +11,6 @@
 #define RUNNING 4
 #define WAITING 5
 
-#define LOADED 6
-#define NOT_LOADED 7
-
 
 void fc_fs(deque_t *pending_process_queue, deque_t *process_queue, char *memory_opt, int memory_size){
 
@@ -21,7 +18,6 @@ void fc_fs(deque_t *pending_process_queue, deque_t *process_queue, char *memory_
     int simulation_time_elapsed = 0;
 
     int state = RUNNING;
-    int loaded = NOT_LOADED;
     int loading_cost = 0;
 
     // MEMORY VARIABLES
@@ -81,7 +77,7 @@ void fc_fs(deque_t *pending_process_queue, deque_t *process_queue, char *memory_
             process_t *place_holder_process = new_process();
 
             step_ff(process_queue, place_holder_process, &simulation_time_elapsed, pages, num_pages,
-                    &space_available, &state, &loaded, &loading_cost);
+                    &space_available, &state, &loading_cost);
 
             /**
              * If interval is over calculate the throughput values
@@ -112,15 +108,13 @@ void fc_fs(deque_t *pending_process_queue, deque_t *process_queue, char *memory_
              */
             if (strstr(memory_opt, "p")) {
 
-                /**
-                 * Set STATE to LOADING
-                 */
-                state = LOADING;
-                loaded = NOT_LOADED;
-                loading_cost = (process->mem_req / PAGE_SIZE) * 2;
-                //printf("Loading time: %d\n", loading_cost);
-                /*printf("%3d, RUNNING, id: %d, remaining-time: %d, load-time: %d\n",
-                       simulation_time_elapsed, process->pid, process->time_remaining, loading_cost);*/
+                if(process->occupying_memory == -1) {
+                    /**
+                     * Set STATE to LOADING
+                     */
+                    state = LOADING;
+                    loading_cost = (process->mem_req / PAGE_SIZE) * 2;
+                }
             }
             else if (strstr(memory_opt, "v")) {
                 // virtual memory
@@ -146,7 +140,7 @@ void fc_fs(deque_t *pending_process_queue, deque_t *process_queue, char *memory_
                  */
                 check_pending(pending_process_queue, process_queue, simulation_time_elapsed);
                 step_ff(process_queue, process, &simulation_time_elapsed, pages, num_pages,
-                        &space_available, &state, &loaded, &loading_cost);
+                        &space_available, &state, &loading_cost);
 
                 /**
                  * If the Process is finished
@@ -237,7 +231,7 @@ void fc_fs(deque_t *pending_process_queue, deque_t *process_queue, char *memory_
  * abstraction of a unit of time (second)
  */
 void step_ff(deque_t *process_queue, process_t *current_process, int *simulation_time_elapsed, int *pages,
-        int num_pages, int *space_available, int* state, int *loaded, int *loading_cost){
+        int num_pages, int *space_available, int* state, int *loading_cost){
 
     /**
      * IF LOADING => LOAD PROCESS PAGES INTO MEMORY
@@ -250,10 +244,9 @@ void step_ff(deque_t *process_queue, process_t *current_process, int *simulation
 
 
         // how long we stay in loaded is based on 2*num loaded pages
-        if(*loaded != LOADED) {
+        if(current_process->occupying_memory == -1) {
 
             swapping_x(pages, num_pages, space_available, current_process, process_queue, *simulation_time_elapsed);
-            *loaded = LOADED;
 
             /**
              * PRINT TO STDOUT
