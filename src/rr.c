@@ -172,7 +172,7 @@ void rr(deque_t *pending_process_queue, deque_t *process_queue, char *memory_opt
                             process->time_remaining);
 
                     deque_insert(process_queue, data);
-                    print_deque(process_queue);
+                    //print_deque(process_queue);
                 }
 
                 /**
@@ -360,7 +360,6 @@ int run_process_rr(process_t *process, int *quantum_rr){
     *quantum_rr = *quantum_rr - 1;
 
     if(*quantum_rr == 0 && process->time_remaining > 0){
-        printf("NOT_DONE\n");
         return NOT_DONE;
     }
     else if(*quantum_rr == 0 && process->time_remaining == 0) {
