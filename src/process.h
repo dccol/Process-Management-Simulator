@@ -11,6 +11,7 @@ typedef struct process {
     int pid;
     int mem_req;
     int time_remaining;
+    int job_time;
     int time_started;
 
 } process_t;

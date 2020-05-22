@@ -110,9 +110,6 @@ void rr(deque_t *pending_process_queue, deque_t *process_queue, char *memory_opt
             // Set start time of process
             process->time_started = simulation_time_elapsed;
 
-            // Record the job time of the process
-            int job_time = process->time_remaining;
-
             /**
              * If memory option not unlimited
              */
@@ -222,7 +219,7 @@ void rr(deque_t *pending_process_queue, deque_t *process_queue, char *memory_opt
                     /**
                      * Calculate Overhead of the process
                      */
-                    calculate_overhead(turnaround_time, job_time, &max_overhead, &overhead_av, num_processes_finished);
+                    calculate_overhead(simulation_time_elapsed, turnaround_time, process->job_time, &max_overhead, &overhead_av, num_processes_finished);
                 }
 
                 /**

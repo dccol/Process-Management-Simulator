@@ -34,6 +34,7 @@ void populate_process_t(process_t *process, int i, char* data){
     }
     if(i == 3){ // time_remaining
         process->time_remaining = i_data;
+        process->job_time = i_data;
     }
 }
 

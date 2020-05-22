@@ -34,12 +34,18 @@ void calculate_turnaround_time(int simulation_time_elapsed, int turnaround_time,
     fprintf(stderr,"%d, TurnAround-avg = %lf\n", simulation_time_elapsed, *turnaround_av);
 }
 
-void calculate_overhead(int turnaround_time, int job_time, double *max_overhead, double *overhead_av, int num_processes_finished){
+void calculate_overhead(int simulation_time_elapsed, int turnaround_time, int job_time, double *max_overhead, double *overhead_av, int num_processes_finished){
 
     double overhead = (double)turnaround_time/(double)job_time;
+    fprintf(stderr,"%d, Overhead = %lf\n", simulation_time_elapsed, overhead);
+
+    fprintf(stderr,"%d, MAX-Overhead = %lf\n", simulation_time_elapsed, *max_overhead);
+
     if (overhead > *max_overhead){
         *max_overhead = overhead;
     }
+    fprintf(stderr,"%d, NEW MAX-Overhead = %lf\n", simulation_time_elapsed, *max_overhead);
     double overhead_total = *overhead_av * (num_processes_finished-1);
     *overhead_av = (overhead_total + overhead)/num_processes_finished;
+    fprintf(stderr,"%d, MAX-Overhead = %lf\n", simulation_time_elapsed, *overhead_av);
 }
