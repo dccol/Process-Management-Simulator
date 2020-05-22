@@ -1,27 +1,65 @@
 
-#include <stdio.h>
-
 #include "rr.h"
-#include "process.h"
 
 #define NOT_DONE 1
 #define DONE 2
 
-void rr(deque_t *pending_process_queue, deque_t *process_queue, int quantum){
+/**
+ * STATES
+ */
+#define LOADING 3
+#define RUNNING 4
+#define WAITING 5
+
+#define LOADED 6
+#define NOT_LOADED 7
+
+void rr(deque_t *pending_process_queue, deque_t *process_queue, char *memory_opt, int memory_size, int quantum){
 
     // VARIABLES
     int simulation_time_elapsed = 0;
 
-    //printf("Next Process will arrive at %d\n", next_process_arrival_time);
+    int state = RUNNING;
+    int loaded = NOT_LOADED;
+    int loading_cost = 0;
 
-    // If a process is received, insert it into the process queue (transfer from pending queue)
-    /*if(simulation_time_elapsed == next_process_arrival_time){
+    // MEMORY VARIABLES
+    int num_pages = -1;
+    int *pages = NULL;
+    int space_available = -1;
 
-        // Update the time of the next process arrival
-        next_process_arrival_time = insert_pending_rr(pending_process_queue, process_queue, simulation_time_elapsed);
-        printf("Next Process will arrive at %d\n", next_process_arrival_time);
-    }*/
+    // STATISTIC VARIABLES
+    int interval_throughput = 0;
+    double throughput_av = 0;
+    int throughput_min = 100;
+    int throughput_max = 0;
 
+    double turnaround_av = 0;
+    int num_processes_finished = 0;
+
+    double max_overhead = 0;
+    double overhead_av = 0;
+
+    /**
+     * If the Memory option is not unlimited, initialize the memory data structure
+     */
+    if(!strstr(memory_opt, "u")){
+
+        // INITIALISE MEMORY
+        num_pages = memory_size/PAGE_SIZE;
+
+        // initialize RAM pages
+        pages = (int*)malloc(sizeof(*pages) * num_pages);
+
+        space_available = num_pages;
+
+        initialize_empty_pages(pages, num_pages);
+        print_memory(pages, num_pages);
+    }
+
+    /**
+     * If a process has been received at time 0 insert it into the process queue (transfer from pending queue)
+     */
     check_pending_rr(pending_process_queue, process_queue, simulation_time_elapsed);
 
     /**
@@ -29,78 +67,309 @@ void rr(deque_t *pending_process_queue, deque_t *process_queue, int quantum){
      * This process will run until either it's time remaining attribute hits 0, or quantum hits 0
      * Quantum resets once a new process has been removed
      */
-    while(process_queue->head != NULL){
-
-        // move declarations outside loop to perhaps save memory? (CHECK VALGRIND)
-        data_t data = deque_remove(process_queue);
-        process_t *process = data.process;
-
-        printf("%3d, RUNNING, id: %d, remaining-time: %d\n", simulation_time_elapsed, process->pid, process->time_remaining);
-
-        // Set the quantum value of the process run time, resets once a new process is ran
-        int quantum_rr = quantum;
+    while(process_queue->head != NULL || pending_process_queue->head != NULL){
 
         /**
-         * This is our time step.
-         * Simulation time elapsed will increase 1:1 per step
-         * Quantum will decrease 1:1 per step
+         * Check whether any new processes have arrived before entering waiting step
          */
-        while(process->time_remaining > 0 && quantum_rr > 0) {
+        check_pending_rr(pending_process_queue, process_queue, simulation_time_elapsed);
 
-            simulation_time_elapsed++;
-            quantum_rr--;
+        /**
+         * If the process queue is empty, but more processes are scheduled to arrive, wait
+         */
+        if(process_queue->head == NULL){
+            state = WAITING;
+            process_t *place_holder_process = new_process();
 
-            // Keep track of the next process arrival time
-            step_rr(pending_process_queue, process_queue, process, simulation_time_elapsed, quantum_rr);
+            int quantum_rr = quantum;
+            step_rr(process_queue, place_holder_process, &simulation_time_elapsed, pages, num_pages,
+                    &space_available, &state, &loaded, &loading_cost, &quantum_rr);
+
+            /**
+             * If interval is over calculate the throughput values
+             */
+            if((simulation_time_elapsed % 60) == 0){
+
+                calculate_throughput(simulation_time_elapsed, &throughput_av, &throughput_min, &throughput_max, interval_throughput);
+
+                // RESET THROUGHPUT_INTERVAL
+                interval_throughput = 0;
+            }
+        }
+
+        /**
+         * Otherwise proceed with the alg as normal
+         */
+        else {
+
+            data_t data = deque_remove(process_queue);
+            process_t *process = data.process;
+
+            // Set start time of process
+            process->time_started = simulation_time_elapsed;
+
+            // Record the job time of the process
+            int job_time = process->time_remaining;
+
+            /**
+             * If memory option not unlimited
+             */
+            if (strstr(memory_opt, "p")) {
+
+                /**
+                 * Set STATE to LOADING
+                 */
+                state = LOADING;
+                loaded = NOT_LOADED;
+                loading_cost = (process->mem_req / PAGE_SIZE) * 2;
+            }
+            else if (strstr(memory_opt, "v")) {
+                // virtual memory
+            }
+            else{ // If memory is unlimited
+                state = RUNNING;
+            }
+
+            /**
+             * Print output to stdout
+             */
+            if (strstr(memory_opt, "u")) {
+                printf("%d, RUNNING, id=%d, remaining-time=%d, quantum=%d\n", simulation_time_elapsed, process->pid,
+                       process->time_remaining, quantum);
+            }
+
+            /*printf("%3d, RUNNING, id: %d, remaining-time: %d\n", simulation_time_elapsed, process->pid,
+                   process->time_remaining);*/
+
+            // Set the quantum value of the process run time, resets once a new process is ran
+            int quantum_rr = quantum;
+
+            /**
+             * This is our time step.
+             * Simulation time elapsed will increase 1:1 per step
+             * Quantum will decrease 1:1 per step
+             */
+            while (process->time_remaining > 0 && quantum_rr > 0) {
+
+                /**
+                 * If a process has been received at current simulation time, insert it into the process queue (transfer from pending queue)
+                 */
+                check_pending_rr(pending_process_queue, process_queue, simulation_time_elapsed);
+
+                /**
+                 * COME BACK TO HERE
+                 */
+                // Keep track of the next process arrival time
+                step_rr(process_queue, process, &simulation_time_elapsed, pages, num_pages,
+                        &space_available, &state, &loaded, &loading_cost, &quantum_rr);
+
+                /**
+                 * If the Process is finished
+                 */
+                if (process->time_remaining == 0) {
+
+
+                    /**
+                     * IF NOT USING UNLIMITED MEMORY REMOVE PROCESS FROM MEMORY
+                     */
+                    if (!strstr(memory_opt, "u")) {
+
+                        int num_process_pages = process->mem_req / PAGE_SIZE;
+                        int *mem_addresses = (int *) malloc(sizeof(*mem_addresses) * num_process_pages);
+                        find_process_mem(pages, num_pages, process, mem_addresses);
+
+                        // Print
+                        printf("%d, EVICTED, mem-addresses=[", simulation_time_elapsed);
+                        for (int i = 0; i < num_process_pages - 1; i++) {
+                            printf("%d,", mem_addresses[i]);
+                        }
+                        printf("%d]\n", mem_addresses[num_process_pages - 1]);
+                        free(mem_addresses);
+
+                        discard_pages(pages, num_pages, &space_available, process);
+                    }
+                    printf("%d, FINISHED, id=%d, proc-remaining=%d\n", simulation_time_elapsed,
+                           process->pid, process_queue->size);
+
+                    /**
+                     * KEEP TRACK OF HOW MANY PROCESSES HAVE FINISHED IN THE INTERVAL
+                     */
+                    interval_throughput++;
+
+                    /**
+                     * KEEP TRACK OF HOW MANY PROCESSES HAVE FINSIHED TOTAL
+                     */
+                    num_processes_finished++;
+
+                    /**
+                     * Calculate TurnAround-time of the process
+                     */
+                    int turnaround_time = simulation_time_elapsed - process->time_rec;
+                    calculate_turnaround_time(simulation_time_elapsed, turnaround_time, &turnaround_av, num_processes_finished);
+
+                    /**
+                     * Calculate Overhead of the process
+                     */
+                    calculate_overhead(turnaround_time, job_time, &max_overhead, &overhead_av, num_processes_finished);
+                }
+
+                /**
+                 * If interval is over calculate the throughput values
+                 */
+                if((simulation_time_elapsed % 60) == 0){
+
+                    calculate_throughput(simulation_time_elapsed, &throughput_av, &throughput_min, &throughput_max, interval_throughput);
+
+                    // RESET THROUGHPUT_INTERVAL
+                    interval_throughput = 0;
+                }
+            }
         }
     }
-    printf("All Processes Complete\n");
+    /**
+     * PRINT STATISTICS
+     */
+    // Round up if decimal
+    if((throughput_av - (int)throughput_av) != 0){
+        throughput_av = round_up(throughput_av);
+    }
+    else{
+        throughput_av = (int)throughput_av;
+    }
+    printf("Throughput%2.0lf, %d, %d\n", throughput_av, throughput_min, throughput_max);
+
+    // Round up if decimal
+    if((turnaround_av - (int)turnaround_av) != 0){
+        turnaround_av = round_up(turnaround_av);
+    }
+    else{
+        turnaround_av= (int)turnaround_av;
+    }
+    printf("Turnaround time %2.0lf\n", turnaround_av);
+
+    /**
+     * ROUND 2 decimals dont just cut them off
+     */
+    printf("Time overhead %.2lf %.2lf\n", max_overhead, overhead_av);
+    printf("Makespan %d\n", simulation_time_elapsed);
+    //printf("All Processes Complete\n");
+    free(pages);
 }
 
 /**
  * abstraction of a unit of time (second)
  */
-void step_rr(deque_t *pending_process_queue, deque_t *process_queue, process_t *current_process,
-         int simulation_time_elapsed, int quantum_rr){
+void step_rr(deque_t *process_queue, process_t *current_process, int *simulation_time_elapsed,int *pages,
+        int num_pages, int *space_available, int *state, int *loaded, int *loading_cost, int *quantum_rr){
 
-    // Status used to determine whether the process should be re-inserted into the process queue
-    int status = run_process_rr(current_process, quantum_rr);
+    if(*state == LOADING){
 
-    //printf("%3d| Current Process Running: %d\tTime Remaining: %d\tQuantum: %d\n", simulation_time_elapsed, current_process->pid, current_process->time_remaining, quantum_rr);
+        // decrement time takes to load
+        fprintf(stderr, "%d, RUNNING, id=%d, remaining-time=%d, load-time=%d\n",
+                *simulation_time_elapsed, current_process->pid, current_process->time_remaining, *loading_cost);
 
-    if(status == NOT_DONE) {
-        /*printf("Inserting Process %d back into the queue. It has %d seconds left\n", current_process->pid,
-               current_process->time_remaining);*/
-        data_t data;
-        data.process = current_process;
-        deque_insert(process_queue, data);
+
+        // how long we stay in loaded is based on 2*num loaded pages
+        if(*loaded != LOADED) {
+
+            swapping_x(pages, num_pages, space_available, current_process, process_queue);
+            *loaded = LOADED;
+
+            /**
+             * PRINT TO STDOUT
+             */
+            double mem_usage = ((double)num_pages - (double)*space_available) / (double)num_pages * 100;
+            if((mem_usage - (int)mem_usage) != 0){
+                mem_usage = round_up(mem_usage);
+            }
+            else{
+                mem_usage = (int)mem_usage;
+            }
+
+            int num_process_pages = current_process->mem_req / PAGE_SIZE;
+
+            int *mem_addresses = (int*)malloc(sizeof(*mem_addresses) * num_process_pages);
+            find_process_mem(pages, num_pages, current_process, mem_addresses);
+
+            // Print
+            printf("%d, RUNNING, id=%d, remaining-time=%d, load-time=%d, mem-usage=%2.0lf%%, mem-addresses=[",
+                   *simulation_time_elapsed, current_process->pid, current_process->time_remaining, *loading_cost, mem_usage);
+            for(int i = 0; i < num_process_pages -1 ; i++){
+                printf("%d,", mem_addresses[i]);
+            }
+            printf("%d]\n", mem_addresses[num_process_pages-1]);
+            free(mem_addresses);
+
+        }
+        // if loading has been completed in the previous tick, tick until loading cost has been reached,
+        // then change the state so that the next tick runs the process
+        else{
+            if(*loading_cost == 1) {
+                *state = RUNNING;
+                //fprintf(stderr, "LOADING COMPLETE\n");
+            }
+        }
+
+        *loading_cost = *loading_cost - 1;
     }
-    if(status == DONE){
-        printf("%3d, FINISHED, id: %d, proc-remaining: %d\n", simulation_time_elapsed, current_process->pid, process_queue->size);
-    }
 
-    /* if we have reach a time where a process would have arrived, simulate its arrival by removing it from the
-     * pending queue and inserting it into the process queue
+    /**
+     * IF RUNNING => RUN THE PROCESS
      */
-    /*if(simulation_time_elapsed == next_process_arrival_time){
+    else if(*state == RUNNING) {
 
-        // update the time of the next process arrival
-        next_process_arrival_time = insert_pending_rr(pending_process_queue, process_queue, simulation_time_elapsed);
-        //printf("Next Process will arrive at %d\n", next_process_arrival_time);
-    }*/
+        //printf("Process %d beginning at time %d\n", current_process->pid, current_process->time_started);
+        fprintf(stderr, "%d, RUNNING, id=%d, remaining-time=%d, quantum=%d\n", *simulation_time_elapsed, current_process->pid,
+                current_process->time_remaining, *quantum_rr);
 
-    check_pending_rr(pending_process_queue, process_queue, simulation_time_elapsed);
+        // Status used to determine whether the process should be re-inserted into the process queue
+        int status = run_process_rr(current_process, quantum_rr);
+
+        /**
+         * If the process is done
+         */
+        if (status == DONE) {
+            /*printf("%3d, FINISHED, id: %d, remaining-time %d, proc-remaining: %d\n", *simulation_time_elapsed,
+                    current_process->pid, current_process->time_remaining, process_queue->size);*/
+        }
+
+        /**
+         * If the process is not done, reinsert it into the process queue
+         */
+        if (status == NOT_DONE) {
+            fprintf(stderr,"Inserting Process %d back into the queue. It has %d seconds left\n", current_process->pid,
+                   current_process->time_remaining);
+            data_t data;
+            data.process = current_process;
+            deque_insert(process_queue, data);
+        }
+    }
+
+    /**
+     * If WAITING => DO NOTHING, but check incoming process' and tick time
+     */
+    else if(*state == WAITING){
+        fprintf(stderr, "%d, WAITING\n", *simulation_time_elapsed);
+    }
+
+    /**
+     * TICK
+     */
+    *simulation_time_elapsed = *simulation_time_elapsed + 1;
 }
 
-int run_process_rr(process_t *process, int quantum_rr){
+int run_process_rr(process_t *process, int *quantum_rr){
 
     // decrement process timer
     process->time_remaining--;
 
-    if(quantum_rr == 0 && process->time_remaining > 0){
+    // decrement quantum
+    *quantum_rr = *quantum_rr - 1;
+
+    if(*quantum_rr == 0 && process->time_remaining > 0){
         return NOT_DONE;
     }
-    else if(quantum_rr == 0 && process->time_remaining == 0) {
+    else if(*quantum_rr == 0 && process->time_remaining == 0) {
         return DONE;
     }
     else if(process->time_remaining == 0) {
@@ -109,17 +378,6 @@ int run_process_rr(process_t *process, int quantum_rr){
     return -1;
 }
 
-int insert_pending_rr(deque_t *pending_process_queue, deque_t *process_queue, int time){
-    data_t data = deque_remove(pending_process_queue);
-    //printf("Process %d arrived at %d\n", data.process->pid, time);
-    deque_insert(process_queue, data);
-    if(pending_process_queue->head != NULL) {
-        return pending_process_queue->foot->data.process->time_rec;
-    }
-    else{ // no more pending
-        return -1;
-    }
-}
 void check_pending_rr(deque_t *pending_process_queue, deque_t *process_queue, int simulation_time){
 
     if(pending_process_queue->head != NULL) {
@@ -152,7 +410,7 @@ void check_pending_rr(deque_t *pending_process_queue, deque_t *process_queue, in
         insertion_sort(processes_to_insert, index);
 
         for (int i = 0; i < index; i++) {
-            printf("%3d, Process ID: %d\n", simulation_time, processes_to_insert[i].process->pid);
+            //fprintf(stderr, "%3d, Process ID: %d\n", simulation_time, processes_to_insert[i].process->pid);
             deque_insert(process_queue, processes_to_insert[i]);
         }
     }

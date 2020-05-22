@@ -79,7 +79,7 @@ int main(int argc, char **argv) {
 
     // Run provided Scheduling Algorithm
     if(strstr(schedule_alg, "rr")){
-        rr(pending_process_queue, process_queue, quantum);
+        rr(pending_process_queue, process_queue, memory_opt, memory_size, quantum);
     }
     else if(strstr(schedule_alg, "ff")) {
         fc_fs(pending_process_queue, process_queue, memory_opt, memory_size);

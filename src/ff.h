@@ -2,6 +2,10 @@
 #ifndef FF_H
 #define FF_H
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
 #include "deque.h"
 #include "process.h"
 #include "sort.h"
@@ -38,14 +42,11 @@ void step_ff(deque_t *process_queue, process_t *current_process, int *simulation
         int num_pages, int *space_available, int *state, int *loaded, int *loading_cost);
 
 /**
- * Takes the first item in the pending queue and adds it to the process queue to simulate the arrival of a new process
- * Returns the new pending process arrival time, derived from the process now at the front on the pending queue
+ * Takes processes from pending queue and adds them to the process queue to simulate the arrival of a new process
  * @param pending_process_queue
  * @param process_queue
  * @return
  */
-int insert_pending_ff(deque_t *pending_process_queue, deque_t *process_queue, int time);
-
 void check_pending(deque_t *pending_process_queue, deque_t *process_queue, int simulation_time);
 
 

@@ -1,6 +1,4 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include "string.h"
+
 #include "ff.h"
 
 #define NOT_DONE 1
@@ -82,8 +80,6 @@ void fc_fs(deque_t *pending_process_queue, deque_t *process_queue, char *memory_
             state = WAITING;
             process_t *place_holder_process = new_process();
 
-
-
             step_ff(process_queue, place_holder_process, &simulation_time_elapsed, pages, num_pages,
                     &space_available, &state, &loaded, &loading_cost);
 
@@ -126,10 +122,11 @@ void fc_fs(deque_t *pending_process_queue, deque_t *process_queue, char *memory_
                 //printf("Loading time: %d\n", loading_cost);
                 /*printf("%3d, RUNNING, id: %d, remaining-time: %d, load-time: %d\n",
                        simulation_time_elapsed, process->pid, process->time_remaining, loading_cost);*/
-            } else if (strstr(memory_opt, "v")) {
+            }
+            else if (strstr(memory_opt, "v")) {
                 // virtual memory
             }
-            else{
+            else{ // If memory is unlimited
                 state = RUNNING;
             }
 
@@ -145,9 +142,6 @@ void fc_fs(deque_t *pending_process_queue, deque_t *process_queue, char *memory_
             // While the process being ran has time remaining, step the simulation
             while (process->time_remaining > 0) {
 
-                // also pass in a state
-                // if state is loading => load pages but simulation time increase by 2 not 1, then change state
-                // if state running => proceed as normal
                 /**
                  * If a process has been received at current simulation time, insert it into the process queue (transfer from pending queue)
                  */
@@ -336,10 +330,10 @@ void step_ff(deque_t *process_queue, process_t *current_process, int *simulation
         fprintf(stderr, "%d, WAITING\n", *simulation_time_elapsed);
     }
 
+    /**
+     * TICK
+     */
     *simulation_time_elapsed = *simulation_time_elapsed + 1;
-
-    //printf("%3d| RUNNING, id: %d, remaining-time: %d\n", simulation_time_elapsed, current_process->pid, current_process->time_remaining);
-    //}
 }
 
 int run_process_ff(process_t *process){
