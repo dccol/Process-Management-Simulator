@@ -1,5 +1,6 @@
 
 #include "statistics.h"
+#include "process.h"
 
 void calculate_throughput(int simulation_time_elapsed, double *throughput_av, int *throughput_min, int *throughput_max, int interval_throughput){
     int interval_num = simulation_time_elapsed/60;
@@ -25,10 +26,20 @@ void calculate_throughput(int simulation_time_elapsed, double *throughput_av, in
     fprintf(stderr,"%d, NEW Min-Throughput = %d\n", simulation_time_elapsed, *throughput_min);
 }
 
-void calculate_turnaround_time(){
+void calculate_turnaround_time(int simulation_time_elapsed, int turnaround_time, double *turnaround_av, int num_processes_finished){
 
+    fprintf(stderr,"%d, TurnAround-time = %d\n", simulation_time_elapsed, turnaround_time);
+    double turnaround_total = *turnaround_av * (num_processes_finished-1);
+    *turnaround_av = (turnaround_total + turnaround_time)/num_processes_finished;
+    fprintf(stderr,"%d, TurnAround-avg = %lf\n", simulation_time_elapsed, *turnaround_av);
 }
 
-void calculate_overhead(){
+void calculate_overhead(int turnaround_time, int job_time, double *max_overhead, double *overhead_av, int num_processes_finished){
 
+    double overhead = (double)turnaround_time/(double)job_time;
+    if (overhead > *max_overhead){
+        *max_overhead = overhead;
+    }
+    double overhead_total = *overhead_av * (num_processes_finished-1);
+    *overhead_av = (overhead_total + overhead)/num_processes_finished;
 }

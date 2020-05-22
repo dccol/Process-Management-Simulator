@@ -92,27 +92,7 @@ void fc_fs(deque_t *pending_process_queue, deque_t *process_queue, char *memory_
              */
             if((simulation_time_elapsed % 60) == 0){
 
-                int interval_num = simulation_time_elapsed/60;
-                fprintf(stderr,"%d, Throughput of Interval %d = %d\n", simulation_time_elapsed, interval_num, interval_throughput);
-                fprintf(stderr,"%d, Avg-Throughput = %lf\n", simulation_time_elapsed, throughput_av);
-                double throughput_total = throughput_av * (interval_num-1);
-                throughput_av = (throughput_total + interval_throughput) / interval_num;
-
-
-                fprintf(stderr,"%d, Max-Throughput = %d\n", simulation_time_elapsed, throughput_max);
-                fprintf(stderr,"%d, Min-Throughput = %d\n", simulation_time_elapsed, throughput_min);
-
-
-
-                if(interval_throughput > throughput_max){
-                    throughput_max = interval_throughput;
-                }
-                if(interval_throughput < throughput_min){
-                    throughput_min = interval_throughput;
-                }
-                fprintf(stderr,"%d, NEW Avg-Throughput = %lf\n", simulation_time_elapsed, throughput_av);
-                fprintf(stderr,"%d, NEW Max-Throughput = %d\n", simulation_time_elapsed, throughput_max);
-                fprintf(stderr,"%d, NEW Min-Throughput = %d\n", simulation_time_elapsed, throughput_min);
+                calculate_overhead(simulation_time_elapsed, &throughput_av, &throughput_min, &throughput_max, interval_throughput);
 
                 // RESET THROUGHPUT_INTERVAL
                 interval_throughput = 0;
@@ -217,20 +197,12 @@ void fc_fs(deque_t *pending_process_queue, deque_t *process_queue, char *memory_
                      * Calculate TurnAround-time of the process
                      */
                     int turnaround_time = simulation_time_elapsed - process->time_rec;
-                    fprintf(stderr,"%d, TurnAround-time = %d\n", simulation_time_elapsed, turnaround_time);
-                    double turnaround_total = turnaround_av * (num_processes_finished-1);
-                    turnaround_av = (turnaround_total + turnaround_time)/num_processes_finished;
-                    fprintf(stderr,"%d, TurnAround-avg = %lf\n", simulation_time_elapsed, turnaround_av);
+                    calculate_turnaround_time(simulation_time_elapsed, turnaround_time, &turnaround_av, num_processes_finished);
 
                     /**
                      * Calculate Overhead of the process
                      */
-                    double overhead = (double)turnaround_time/(double)job_time;
-                    if (overhead > max_overhead){
-                        max_overhead = overhead;
-                    }
-                    double overhead_total = overhead_av * (num_processes_finished-1);
-                    overhead_av = (overhead_total + overhead)/num_processes_finished;
+                    calculate_overhead(turnaround_time, job_time, &max_overhead, &overhead_av, num_processes_finished);
                 }
 
                 /**
