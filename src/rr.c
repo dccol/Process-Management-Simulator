@@ -168,7 +168,7 @@ void rr(deque_t *pending_process_queue, deque_t *process_queue, char *memory_opt
                             process->time_remaining);
 
                     deque_insert(process_queue, data);
-                    print_deque(process_queue);
+                    //print_deque(process_queue);
                 }
 
                 /**

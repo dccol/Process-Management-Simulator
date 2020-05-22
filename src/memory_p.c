@@ -49,7 +49,7 @@ void load_pages(int *pages, int num_pages, int *space_available, process_t *proc
      * Set occupying memory to true
      */
     process->occupying_memory = 1;
-    print_memory(pages, num_pages);
+    //print_memory(pages, num_pages);
     /*if (pages_remaining != 0) {
 
         swap_pages(pages, num_pages, space_available, process, pages_remaining, process_queue);
