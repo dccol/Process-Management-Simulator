@@ -127,8 +127,6 @@ void rr(deque_t *pending_process_queue, deque_t *process_queue, char *memory_opt
                      */
                     state = LOADING;
                     loading_cost = (process->mem_req / PAGE_SIZE) * 2;
-                } else{
-                    printf("No need to load\n");
                 }
             }
             else if (strstr(memory_opt, "v")) {
