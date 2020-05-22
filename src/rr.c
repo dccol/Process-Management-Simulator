@@ -152,12 +152,6 @@ void rr(deque_t *pending_process_queue, deque_t *process_queue, char *memory_opt
              */
             while (process->time_remaining > 0 && quantum_rr > 0) {
 
-
-
-                /**
-                 * COME BACK TO HERE
-                 */
-                // Keep track of the next process arrival time
                 step_rr(process_queue, process, &simulation_time_elapsed, pages, num_pages,
                         &space_available, &state, &loaded, &loading_cost, &quantum_rr, &status);
 
@@ -174,7 +168,7 @@ void rr(deque_t *pending_process_queue, deque_t *process_queue, char *memory_opt
                             process->time_remaining);
 
                     deque_insert(process_queue, data);
-                    //print_deque(process_queue);
+                    print_deque(process_queue);
                 }
 
                 /**

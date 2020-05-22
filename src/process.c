@@ -11,6 +11,7 @@ process_t *new_process() {
     process = (process_t*)malloc(sizeof(*process));
     assert(process!=NULL);
     process->time_started = -1;
+    process->occupying_memory = -1;
     /*process->time_rec = (int)malloc(sizeof(int));
     process->pid = (int)malloc(sizeof(int));
     process->mem_req = (int)malloc(sizeof(int));

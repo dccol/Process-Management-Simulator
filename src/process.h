@@ -13,6 +13,7 @@ typedef struct process {
     int time_remaining;
     int job_time;
     int time_started;
+    int occupying_memory;
 
 } process_t;
 
