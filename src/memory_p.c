@@ -5,7 +5,7 @@ void swapping_x(int *pages, int num_pages, int *space_available, process_t *proc
 
     // Pages remaining to load
     int process_pages_req = process->mem_req / PAGE_SIZE;
-    printf("Process %d needs %d pages of memory\n", process->pid, process_pages_req);
+    //printf("Process %d needs %d pages of memory\n", process->pid, process_pages_req);
 
     /**
      * If enough space available load pages
@@ -62,8 +62,8 @@ void swap_pages(int *pages, int num_pages, int *space_available, process_t *proc
     // how to find the process least recently executed?
     // the first visited!!!! process in the process queue
 
-    printf("Swapping pages\n");
-    printf("Pages remaining: %d\n", pages_remaining);
+    //printf("Swapping pages\n");
+    //printf("Pages remaining: %d\n", pages_remaining);
 
     /**
      * determine least recent process
@@ -72,10 +72,10 @@ void swap_pages(int *pages, int num_pages, int *space_available, process_t *proc
 
     node_t *curr = process_queue->foot;
     while (curr != NULL) {
-        printf("curr process: Process %d\n", curr->data.process->pid);
+        //printf("curr process: Process %d\n", curr->data.process->pid);
         if (curr->data.process->time_started != -1 && curr->data.process->occupying_memory != -1) {
             least_recent_process = curr->data.process;
-            printf("least recent process: Process %d\n", least_recent_process->pid);
+            //printf("least recent process: Process %d\n", least_recent_process->pid);
             break;
         } else { // if the process at the front of the queue has not yet been executed, there is no memory to replace
             curr = curr->prev;
@@ -83,9 +83,9 @@ void swap_pages(int *pages, int num_pages, int *space_available, process_t *proc
     }
     // discard its pages from memory
     discard_pages(pages, num_pages, space_available, least_recent_process);
-    printf("Flushed memory\n");
-    print_memory(pages, num_pages);
-    printf("\n");
+    //printf("Flushed memory\n");
+    //print_memory(pages, num_pages);
+    //printf("\n");
 
     // call function again?
 
