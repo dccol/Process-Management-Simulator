@@ -238,7 +238,7 @@ void fc_fs(deque_t *pending_process_queue, deque_t *process_queue, char *memory_
     else{
         throughput_av = (int)throughput_av;
     }
-    printf("Throughput %2.0lf, %d, %d\n", throughput_av, throughput_min, throughput_max);
+    printf("Throughput%2.0lf, %d, %d\n", throughput_av, throughput_min, throughput_max);
     printf("All Processes Complete\n");
     free(pages);
 }
