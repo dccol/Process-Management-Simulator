@@ -92,7 +92,7 @@ void fc_fs(deque_t *pending_process_queue, deque_t *process_queue, char *memory_
              */
             if((simulation_time_elapsed % 60) == 0){
 
-                calculate_overhead(simulation_time_elapsed, &throughput_av, &throughput_min, &throughput_max, interval_throughput);
+                calculate_throughput(simulation_time_elapsed, &throughput_av, &throughput_min, &throughput_max, interval_throughput);
 
                 // RESET THROUGHPUT_INTERVAL
                 interval_throughput = 0;
@@ -409,6 +409,7 @@ void check_pending(deque_t *pending_process_queue, deque_t *process_queue, int s
             //printf("%3d, Process ID: %d arrived\n", simulation_time, processes_to_insert[i].process->pid);
             deque_insert(process_queue, processes_to_insert[i]);
         }
+        // MEMORY LEAK
         free(processes_to_insert);
     }
 }

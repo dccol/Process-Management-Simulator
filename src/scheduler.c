@@ -86,6 +86,8 @@ int main(int argc, char **argv) {
     }
     free_deque(pending_process_queue);
     free_deque(process_queue);
+    free(memory_opt);
+    free(schedule_alg);
     return 0;
 }
 
