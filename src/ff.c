@@ -38,7 +38,10 @@ void fc_fs(deque_t *pending_process_queue, deque_t *process_queue, char *memory_
     int throughput_max = 0;
 
     double turnaround_av = 0;
-    int num_processes_finised = 0;
+    int num_processes_finished = 0;
+
+    double max_overhead = 0;
+    double overhead_av = 0;
 
     /**
      * If the Memory option is not unlimited, initialize the memory data structure
@@ -126,6 +129,9 @@ void fc_fs(deque_t *pending_process_queue, deque_t *process_queue, char *memory_
             // Set start time of process
             process->time_started = simulation_time_elapsed;
 
+            // Record the job time of the process
+            int job_time = process->time_remaining;
+
             /**
              * If memory option not unlimited
              */
@@ -205,18 +211,26 @@ void fc_fs(deque_t *pending_process_queue, deque_t *process_queue, char *memory_
                     /**
                      * KEEP TRAKC OF HOW MANY PROCESSES HAVE FINSIHED TOTAL
                      */
-                    num_processes_finised++;
+                    num_processes_finished++;
 
                     /**
                      * Calculate TurnAround-time of the process
                      */
                     int turnaround_time = simulation_time_elapsed - process->time_rec;
                     fprintf(stderr,"%d, TurnAround-time = %d\n", simulation_time_elapsed, turnaround_time);
-                    double turnaround_total = turnaround_av * (num_processes_finised-1);
-                    turnaround_av = (turnaround_total + turnaround_time)/num_processes_finised;
+                    double turnaround_total = turnaround_av * (num_processes_finished-1);
+                    turnaround_av = (turnaround_total + turnaround_time)/num_processes_finished;
                     fprintf(stderr,"%d, TurnAround-avg = %lf\n", simulation_time_elapsed, turnaround_av);
 
-
+                    /**
+                     * Calculate Overhead of the process
+                     */
+                    double overhead = (double)turnaround_time/(double)job_time;
+                    if (overhead > max_overhead){
+                        max_overhead = overhead;
+                    }
+                    double overhead_total = overhead_av * (num_processes_finished-1);
+                    overhead_av = (overhead_total + overhead)/num_processes_finished;
                 }
 
                 /**
@@ -254,6 +268,9 @@ void fc_fs(deque_t *pending_process_queue, deque_t *process_queue, char *memory_
         }
     }
 
+    /**
+     * PRINT STATISTICS
+     */
     // Round up if decimal
     if((throughput_av - (int)throughput_av) != 0){
         throughput_av = round_up(throughput_av);
@@ -271,6 +288,7 @@ void fc_fs(deque_t *pending_process_queue, deque_t *process_queue, char *memory_
         turnaround_av= (int)turnaround_av;
     }
     printf("Turnaround time %2.0lf\n", turnaround_av);
+    printf("Time overhead %.2lf %.2lf\n", max_overhead, overhead_av);
     printf("All Processes Complete\n");
     free(pages);
 }
