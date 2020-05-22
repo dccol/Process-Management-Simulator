@@ -31,6 +31,12 @@ void fc_fs(deque_t *pending_process_queue, deque_t *process_queue, char *memory_
     int *pages = NULL;
     int space_available = -1;
 
+    // STATISTICS VARIABLES
+    int interval_throughput = 0;
+    double throughput_av = 0;
+    int throughput_min = 100;
+    int throughput_max = 0;
+
     /**
      * If the Memory option is not unlimited, initialize the memory data structure
      */
@@ -74,6 +80,37 @@ void fc_fs(deque_t *pending_process_queue, deque_t *process_queue, char *memory_
 
             step_ff(pending_process_queue, process_queue, place_holder_process, &simulation_time_elapsed, pages, num_pages,
                     &space_available, memory_opt, &state, &loaded, &loading_cost);
+
+            /**
+             * If interval is over calculate the throughput values
+             */
+            if((simulation_time_elapsed % 60) == 0){
+
+                int interval_num = simulation_time_elapsed/60;
+                fprintf(stderr,"%d, Throughput of Interval %d = %d\n", simulation_time_elapsed, interval_num, interval_throughput);
+                fprintf(stderr,"%d, Avg-Throughput = %lf\n", simulation_time_elapsed, throughput_av);
+                double throughput_total = throughput_av * (interval_num-1);
+                throughput_av = (throughput_total + interval_throughput) / interval_num;
+
+
+                fprintf(stderr,"%d, Max-Throughput = %d\n", simulation_time_elapsed, throughput_max);
+                fprintf(stderr,"%d, Min-Throughput = %d\n", simulation_time_elapsed, throughput_min);
+
+
+
+                if(interval_throughput > throughput_max){
+                    throughput_max = interval_throughput;
+                }
+                if(interval_throughput < throughput_min){
+                    throughput_min = interval_throughput;
+                }
+                fprintf(stderr,"%d, NEW Avg-Throughput = %lf\n", simulation_time_elapsed, throughput_av);
+                fprintf(stderr,"%d, NEW Max-Throughput = %d\n", simulation_time_elapsed, throughput_max);
+                fprintf(stderr,"%d, NEW Min-Throughput = %d\n", simulation_time_elapsed, throughput_min);
+
+                // RESET THROUGHPUT_INTERVAL
+                interval_throughput = 0;
+            }
         }
 
         /**
@@ -116,8 +153,6 @@ void fc_fs(deque_t *pending_process_queue, deque_t *process_queue, char *memory_
             // While the process being ran has time remaining, step the simulation
             while (process->time_remaining > 0) {
 
-                //simulation_time_elapsed++;
-
                 // also pass in a state
                 // if state is loading => load pages but simulation time increase by 2 not 1, then change state
                 // if state running => proceed as normal
@@ -131,7 +166,9 @@ void fc_fs(deque_t *pending_process_queue, deque_t *process_queue, char *memory_
                 /**
                  * If the Process is finished => Print output
                  */
+
                 if (process->time_remaining == 0) {
+
 
                     /**
                      * IF NOT USING UNLIMITED MEMORY REMOVE PROCESS FROM MEMORY
@@ -154,11 +191,54 @@ void fc_fs(deque_t *pending_process_queue, deque_t *process_queue, char *memory_
                     }
                     printf("%d, FINISHED, id=%d, proc-remaining=%d\n", simulation_time_elapsed,
                            process->pid, process_queue->size);
+
+                    // KEEP TRACK OF HOW MANY PROCESSES HAVE FINISHED IN THE INTERVAL
+                    interval_throughput++;
+                    //int interval_num = simulation_time_elapsed/60;
+                    //printf("Interval-Throughput of Interval %d = %d\n", interval_num, interval_throughput);
+                }
+
+                /**
+                 * If interval is over calculate the throughput values
+                 */
+                if((simulation_time_elapsed % 60) == 0){
+
+                    int interval_num = simulation_time_elapsed/60;
+                    fprintf(stderr,"%d, Throughput of Interval %d = %d\n", simulation_time_elapsed, interval_num, interval_throughput);
+                    fprintf(stderr,"%d, Avg-Throughput = %lf\n", simulation_time_elapsed, throughput_av);
+                    double throughput_total = throughput_av * (interval_num-1);
+                    throughput_av = (throughput_total + interval_throughput) / interval_num;
+
+
+                    fprintf(stderr,"%d, Max-Throughput = %d\n", simulation_time_elapsed, throughput_max);
+                    fprintf(stderr,"%d, Min-Throughput = %d\n", simulation_time_elapsed, throughput_min);
+
+
+
+                    if(interval_throughput > throughput_max){
+                        throughput_max = interval_throughput;
+                    }
+                    if(interval_throughput < throughput_min){
+                        throughput_min = interval_throughput;
+                    }
+                    fprintf(stderr,"%d, NEW Avg-Throughput = %lf\n", simulation_time_elapsed, throughput_av);
+                    fprintf(stderr,"%d, NEW Max-Throughput = %d\n", simulation_time_elapsed, throughput_max);
+                    fprintf(stderr,"%d, NEW Min-Throughput = %d\n", simulation_time_elapsed, throughput_min);
+
+                    // RESET THROUGHPUT_INTERVAL
+                    interval_throughput = 0;
                 }
 
             }
         }
     }
+    if((throughput_av - (int)throughput_av) != 0){
+        throughput_av = round_up(throughput_av);
+    }
+    else{
+        throughput_av = (int)throughput_av;
+    }
+    printf("Throughput %2.0lf, %d, %d\n", throughput_av, throughput_min, throughput_max);
     printf("All Processes Complete\n");
     free(pages);
 }
