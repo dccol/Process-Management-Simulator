@@ -56,7 +56,7 @@ void rr(deque_t *pending_process_queue, deque_t *process_queue, char *memory_opt
         space_available = num_pages;
 
         initialize_empty_pages(pages, num_pages);
-        print_memory(pages, num_pages);
+        //print_memory(pages, num_pages);
     }
 
     /**
