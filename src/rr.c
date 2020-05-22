@@ -134,8 +134,8 @@ void rr(deque_t *pending_process_queue, deque_t *process_queue, char *memory_opt
              * Print output to stdout
              */
             if (strstr(memory_opt, "u")) {
-                printf("%d, RUNNING, id=%d, remaining-time=%d, quantum=%d\n", simulation_time_elapsed, process->pid,
-                       process->time_remaining, quantum);
+                printf("%d, RUNNING, id=%d, remaining-time=%d\n", simulation_time_elapsed, process->pid,
+                       process->time_remaining);
             }
 
             /*printf("%3d, RUNNING, id: %d, remaining-time: %d\n", simulation_time_elapsed, process->pid,

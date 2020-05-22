@@ -347,18 +347,6 @@ int run_process_ff(process_t *process){
     return NOT_DONE;
 }
 
-int insert_pending_ff(deque_t *pending_process_queue, deque_t *process_queue, int time){
-    data_t data = deque_remove(pending_process_queue);
-    //printf("Process %d arrived at %d\n", data.process->pid, time);
-    deque_insert(process_queue, data);
-    if(pending_process_queue->head != NULL) {
-        return pending_process_queue->foot->data.process->time_rec;
-    }
-    else{ // no more pending
-        return -1;
-    }
-}
-
 /**
  * If there are pending processes, check if any arrives at time = simulation time elapsed
  * @param pending_process_queue
