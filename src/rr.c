@@ -286,27 +286,7 @@ void step_rr(deque_t *process_queue, process_t *current_process, int *simulation
             /**
              * PRINT TO STDOUT
              */
-            double mem_usage = ((double)num_pages - (double)*space_available) / (double)num_pages * 100;
-            if((mem_usage - (int)mem_usage) != 0){
-                mem_usage = round_up(mem_usage);
-            }
-            else{
-                mem_usage = (int)mem_usage;
-            }
-
-            int num_process_pages = current_process->mem_req / PAGE_SIZE;
-
-            int *mem_addresses = (int*)malloc(sizeof(*mem_addresses) * num_process_pages);
-            find_process_mem(pages, num_pages, current_process, mem_addresses);
-
-            // Print
-            printf("%d, RUNNING, id=%d, remaining-time=%d, load-time=%d, mem-usage=%2.0lf%%, mem-addresses=[",
-                   *simulation_time_elapsed, current_process->pid, current_process->time_remaining, *loading_cost, mem_usage);
-            for(int i = 0; i < num_process_pages -1 ; i++){
-                printf("%d,", mem_addresses[i]);
-            }
-            printf("%d]\n", mem_addresses[num_process_pages-1]);
-            free(mem_addresses);
+            print_load(pages, num_pages, space_available, current_process, loading_cost, simulation_time_elapsed);
 
         }
         // if loading has been completed in the previous tick, tick until loading cost has been reached,
@@ -314,33 +294,13 @@ void step_rr(deque_t *process_queue, process_t *current_process, int *simulation
         else{
             if(*loading_cost == 1) {
                 *state = RUNNING;
-                //fprintf(stderr, "LOADING COMPLETE\n");
+
             } else if (*loading_cost == 0){
                 /**
                  * PRINTTTTTTT
                  */
                 *state = RUNNING;
-                double mem_usage = ((double)num_pages - (double)*space_available) / (double)num_pages * 100;
-                if((mem_usage - (int)mem_usage) != 0){
-                    mem_usage = round_up(mem_usage);
-                }
-                else{
-                    mem_usage = (int)mem_usage;
-                }
-
-                int num_process_pages = current_process->mem_req / PAGE_SIZE;
-
-                int *mem_addresses = (int*)malloc(sizeof(*mem_addresses) * num_process_pages);
-                find_process_mem(pages, num_pages, current_process, mem_addresses);
-
-                // Print
-                printf("%d, RUNNING, id=%d, remaining-time=%d, load-time=%d, mem-usage=%2.0lf%%, mem-addresses=[",
-                       *simulation_time_elapsed, current_process->pid, current_process->time_remaining, *loading_cost, mem_usage);
-                for(int i = 0; i < num_process_pages -1 ; i++){
-                    printf("%d,", mem_addresses[i]);
-                }
-                printf("%d]\n", mem_addresses[num_process_pages-1]);
-                free(mem_addresses);
+                print_load(pages, num_pages, space_available, current_process, loading_cost, simulation_time_elapsed);
 
                 /**
                  * RETURN SO TICK DOESNT OCCUR
