@@ -289,7 +289,8 @@ void fc_fs(deque_t *pending_process_queue, deque_t *process_queue, char *memory_
     }
     printf("Turnaround time %2.0lf\n", turnaround_av);
     printf("Time overhead %.2lf %.2lf\n", max_overhead, overhead_av);
-    printf("All Processes Complete\n");
+    printf("Makespan %d\n", simulation_time_elapsed);
+    //printf("All Processes Complete\n");
     free(pages);
 }
 
