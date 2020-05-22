@@ -209,7 +209,7 @@ void fc_fs(deque_t *pending_process_queue, deque_t *process_queue, char *memory_
                     interval_throughput++;
 
                     /**
-                     * KEEP TRAKC OF HOW MANY PROCESSES HAVE FINSIHED TOTAL
+                     * KEEP TRACK OF HOW MANY PROCESSES HAVE FINSIHED TOTAL
                      */
                     num_processes_finished++;
 
@@ -238,27 +238,7 @@ void fc_fs(deque_t *pending_process_queue, deque_t *process_queue, char *memory_
                  */
                 if((simulation_time_elapsed % 60) == 0){
 
-                    int interval_num = simulation_time_elapsed/60;
-                    fprintf(stderr,"%d, Throughput of Interval %d = %d\n", simulation_time_elapsed, interval_num, interval_throughput);
-                    fprintf(stderr,"%d, Avg-Throughput = %lf\n", simulation_time_elapsed, throughput_av);
-                    double throughput_total = throughput_av * (interval_num-1);
-                    throughput_av = (throughput_total + interval_throughput) / interval_num;
-
-
-                    fprintf(stderr,"%d, Max-Throughput = %d\n", simulation_time_elapsed, throughput_max);
-                    fprintf(stderr,"%d, Min-Throughput = %d\n", simulation_time_elapsed, throughput_min);
-
-
-
-                    if(interval_throughput > throughput_max){
-                        throughput_max = interval_throughput;
-                    }
-                    if(interval_throughput < throughput_min){
-                        throughput_min = interval_throughput;
-                    }
-                    fprintf(stderr,"%d, NEW Avg-Throughput = %lf\n", simulation_time_elapsed, throughput_av);
-                    fprintf(stderr,"%d, NEW Max-Throughput = %d\n", simulation_time_elapsed, throughput_max);
-                    fprintf(stderr,"%d, NEW Min-Throughput = %d\n", simulation_time_elapsed, throughput_min);
+                    calculate_throughput(simulation_time_elapsed, &throughput_av, &throughput_min, &throughput_max, interval_throughput);
 
                     // RESET THROUGHPUT_INTERVAL
                     interval_throughput = 0;
@@ -288,6 +268,10 @@ void fc_fs(deque_t *pending_process_queue, deque_t *process_queue, char *memory_
         turnaround_av= (int)turnaround_av;
     }
     printf("Turnaround time %2.0lf\n", turnaround_av);
+
+    /**
+     * ROUND 2 decimals dont just cut them off
+     */
     printf("Time overhead %.2lf %.2lf\n", max_overhead, overhead_av);
     printf("Makespan %d\n", simulation_time_elapsed);
     //printf("All Processes Complete\n");
