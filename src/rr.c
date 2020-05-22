@@ -104,11 +104,16 @@ void rr(deque_t *pending_process_queue, deque_t *process_queue, char *memory_opt
          */
         else {
 
+            /**
+             * Remove the first process from the queue
+             */
             data_t data = deque_remove(process_queue);
             process_t *process = data.process;
 
-            // Set start time of process
-            process->time_started = simulation_time_elapsed;
+            // Set start time of process if it has not been run yet
+            if(process->time_started == -1) {
+                process->time_started = simulation_time_elapsed;
+            }
 
             /**
              * If memory option not unlimited
