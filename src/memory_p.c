@@ -122,7 +122,7 @@ void swap_pages(int *pages, int num_pages, int *space_available, process_t *proc
      * LOAD
      */
 
-    printf("Enough spcace, load pages\n");
+    //printf("Enough spcace, load pages\n");
     load_pages(pages, num_pages, space_available, process, pages_remaining, process_queue);
     // fil the pages with the process to be executed pages
     /*for(int i = 0; i < num_pages; i++){

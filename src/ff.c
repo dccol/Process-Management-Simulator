@@ -55,7 +55,7 @@ void fc_fs(deque_t *pending_process_queue, deque_t *process_queue, char *memory_
         space_available = num_pages;
 
         initialize_empty_pages(pages, num_pages);
-        print_memory(pages, num_pages);
+        //print_memory(pages, num_pages);
     }
 
     /**
