@@ -84,8 +84,8 @@ void fc_fs(deque_t *pending_process_queue, deque_t *process_queue, char *memory_
 
 
 
-            step_ff(pending_process_queue, process_queue, place_holder_process, &simulation_time_elapsed, pages, num_pages,
-                    &space_available, memory_opt, &state, &loaded, &loading_cost);
+            step_ff(process_queue, place_holder_process, &simulation_time_elapsed, pages, num_pages,
+                    &space_available, &state, &loaded, &loading_cost);
 
             /**
              * If interval is over calculate the throughput values
@@ -152,8 +152,8 @@ void fc_fs(deque_t *pending_process_queue, deque_t *process_queue, char *memory_
                  * If a process has been received at current simulation time, insert it into the process queue (transfer from pending queue)
                  */
                 check_pending(pending_process_queue, process_queue, simulation_time_elapsed);
-                step_ff(pending_process_queue, process_queue, process, &simulation_time_elapsed, pages, num_pages,
-                        &space_available, memory_opt, &state, &loaded, &loading_cost);
+                step_ff(process_queue, process, &simulation_time_elapsed, pages, num_pages,
+                        &space_available, &state, &loaded, &loading_cost);
 
                 /**
                  * If the Process is finished
