@@ -1,7 +1,7 @@
 
 #include "memory_p.h"
 
-void swapping_x(int *pages, int num_pages, int *space_available, process_t *process, deque_t *process_queue){
+void swapping_x(int *pages, int num_pages, int *space_available, process_t *process, deque_t *process_queue, int simulation_time_elapsed){
 
     // Pages remaining to load
     int process_pages_req = process->mem_req / PAGE_SIZE;
@@ -15,7 +15,7 @@ void swapping_x(int *pages, int num_pages, int *space_available, process_t *proc
         load_pages(pages, num_pages, space_available, process, process_pages_req, process_queue);
     }
     else{
-        swap_pages(pages, num_pages, space_available, process, process_pages_req, process_queue);
+        swap_pages(pages, num_pages, space_available, process, process_pages_req, process_queue, simulation_time_elapsed);
     }
 
 }
@@ -56,7 +56,7 @@ void load_pages(int *pages, int num_pages, int *space_available, process_t *proc
     }*/
 }
 
-void swap_pages(int *pages, int num_pages, int *space_available, process_t *process, int pages_remaining, deque_t *process_queue){
+void swap_pages(int *pages, int num_pages, int *space_available, process_t *process, int pages_remaining, deque_t *process_queue, int simulation_time_elapsed){
 
     // find the process least recently executed and replace its pages
     // how to find the process least recently executed?
@@ -82,6 +82,17 @@ void swap_pages(int *pages, int num_pages, int *space_available, process_t *proc
         }
     }
     // discard its pages from memory
+    int num_process_pages = process->mem_req / PAGE_SIZE;
+    int *mem_addresses = (int *) malloc(sizeof(*mem_addresses) * num_process_pages);
+    find_process_mem(pages, num_pages, least_recent_process, mem_addresses);
+
+    // Print
+    printf("%d, EVICTED, mem-addresses=[", simulation_time_elapsed);
+    for (int i = 0; i < num_process_pages - 1; i++) {
+        printf("%d,", mem_addresses[i]);
+    }
+    printf("%d]\n", mem_addresses[num_process_pages - 1]);
+    free(mem_addresses);
     discard_pages(pages, num_pages, space_available, least_recent_process);
     //printf("Flushed memory\n");
     //print_memory(pages, num_pages);
@@ -110,6 +121,18 @@ void swap_pages(int *pages, int num_pages, int *space_available, process_t *proc
         }
 
         // discard its pages from memory
+         num_process_pages = process->mem_req / PAGE_SIZE;
+        mem_addresses = (int *) malloc(sizeof(*mem_addresses) * num_process_pages);
+        find_process_mem(pages, num_pages, least_recent_process, mem_addresses);
+
+        // Print
+        printf("%d, EVICTED, mem-addresses=[", simulation_time_elapsed);
+        for (int i = 0; i < num_process_pages - 1; i++) {
+            printf("%d,", mem_addresses[i]);
+        }
+        printf("%d]\n", mem_addresses[num_process_pages - 1]);
+        free(mem_addresses);
+
         discard_pages(pages, num_pages, space_available, least_recent_process);
     }
     //free(least_recent_process);

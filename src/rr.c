@@ -280,7 +280,7 @@ void step_rr(deque_t *process_queue, process_t *current_process, int *simulation
         // how long we stay in loaded is based on 2*num loaded pages
         if(*loaded != LOADED) {
 
-            swapping_x(pages, num_pages, space_available, current_process, process_queue);
+            swapping_x(pages, num_pages, space_available, current_process, process_queue, *simulation_time_elapsed);
             *loaded = LOADED;
 
             /**
