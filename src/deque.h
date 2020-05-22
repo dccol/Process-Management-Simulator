@@ -43,4 +43,6 @@ data_t deque_remove(deque_t *deque);
 
 int deque_size(deque_t *deque);
 
+void print_deque(deque_t *deque);
+
 #endif

@@ -23,6 +23,8 @@ void rr(deque_t *pending_process_queue, deque_t *process_queue, char *memory_opt
     int loaded = NOT_LOADED;
     int loading_cost = 0;
 
+    int status = NOT_DONE;
+
     // MEMORY VARIABLES
     int num_pages = -1;
     int *pages = NULL;
@@ -83,7 +85,7 @@ void rr(deque_t *pending_process_queue, deque_t *process_queue, char *memory_opt
 
             int quantum_rr = quantum;
             step_rr(process_queue, place_holder_process, &simulation_time_elapsed, pages, num_pages,
-                    &space_available, &state, &loaded, &loading_cost, &quantum_rr);
+                    &space_available, &state, &loaded, &loading_cost, &quantum_rr, &status);
 
             /**
              * If interval is over calculate the throughput values
@@ -138,9 +140,6 @@ void rr(deque_t *pending_process_queue, deque_t *process_queue, char *memory_opt
                        process->time_remaining);
             }
 
-            /*printf("%3d, RUNNING, id: %d, remaining-time: %d\n", simulation_time_elapsed, process->pid,
-                   process->time_remaining);*/
-
             // Set the quantum value of the process run time, resets once a new process is ran
             int quantum_rr = quantum;
 
@@ -151,17 +150,30 @@ void rr(deque_t *pending_process_queue, deque_t *process_queue, char *memory_opt
              */
             while (process->time_remaining > 0 && quantum_rr > 0) {
 
-                /**
-                 * If a process has been received at current simulation time, insert it into the process queue (transfer from pending queue)
-                 */
-                check_pending_rr(pending_process_queue, process_queue, simulation_time_elapsed);
+
 
                 /**
                  * COME BACK TO HERE
                  */
                 // Keep track of the next process arrival time
                 step_rr(process_queue, process, &simulation_time_elapsed, pages, num_pages,
-                        &space_available, &state, &loaded, &loading_cost, &quantum_rr);
+                        &space_available, &state, &loaded, &loading_cost, &quantum_rr, &status);
+
+                /**
+                 * If a process has been received at current simulation time, insert it into the process queue (transfer from pending queue)
+                 */
+                check_pending_rr(pending_process_queue, process_queue, simulation_time_elapsed);
+
+                /**
+                 * If the process is not done, reinsert it into the process queue
+                 */
+                if (status == NOT_DONE && quantum_rr == 0) {
+                    fprintf(stderr,"%d, Inserting Process %d back into the queue. It has %d seconds left\n", simulation_time_elapsed, process->pid,
+                            process->time_remaining);
+
+                    deque_insert(process_queue, data);
+                    print_deque(process_queue);
+                }
 
                 /**
                  * If the Process is finished
@@ -260,7 +272,7 @@ void rr(deque_t *pending_process_queue, deque_t *process_queue, char *memory_opt
  * abstraction of a unit of time (second)
  */
 void step_rr(deque_t *process_queue, process_t *current_process, int *simulation_time_elapsed,int *pages,
-        int num_pages, int *space_available, int *state, int *loaded, int *loading_cost, int *quantum_rr){
+        int num_pages, int *space_available, int *state, int *loaded, int *loading_cost, int *quantum_rr, int *status){
 
     if(*state == LOADING){
 
@@ -323,26 +335,7 @@ void step_rr(deque_t *process_queue, process_t *current_process, int *simulation
                 current_process->time_remaining, *quantum_rr);
 
         // Status used to determine whether the process should be re-inserted into the process queue
-        int status = run_process_rr(current_process, quantum_rr);
-
-        /**
-         * If the process is done
-         */
-        if (status == DONE) {
-            /*printf("%3d, FINISHED, id: %d, remaining-time %d, proc-remaining: %d\n", *simulation_time_elapsed,
-                    current_process->pid, current_process->time_remaining, process_queue->size);*/
-        }
-
-        /**
-         * If the process is not done, reinsert it into the process queue
-         */
-        if (status == NOT_DONE) {
-            fprintf(stderr,"Inserting Process %d back into the queue. It has %d seconds left\n", current_process->pid,
-                   current_process->time_remaining);
-            data_t data;
-            data.process = current_process;
-            deque_insert(process_queue, data);
-        }
+        *status = run_process_rr(current_process, quantum_rr);
     }
 
     /**
@@ -367,6 +360,7 @@ int run_process_rr(process_t *process, int *quantum_rr){
     *quantum_rr = *quantum_rr - 1;
 
     if(*quantum_rr == 0 && process->time_remaining > 0){
+        printf("NOT_DONE\n");
         return NOT_DONE;
     }
     else if(*quantum_rr == 0 && process->time_remaining == 0) {
@@ -410,10 +404,8 @@ void check_pending_rr(deque_t *pending_process_queue, deque_t *process_queue, in
         insertion_sort(processes_to_insert, index);
 
         for (int i = 0; i < index; i++) {
-            //fprintf(stderr, "%3d, Process ID: %d\n", simulation_time, processes_to_insert[i].process->pid);
+            fprintf(stderr, "%3d, Process ID: %d\n", simulation_time, processes_to_insert[i].process->pid);
             deque_insert(process_queue, processes_to_insert[i]);
         }
     }
-
-
 }

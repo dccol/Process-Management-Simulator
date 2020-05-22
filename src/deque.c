@@ -112,3 +112,12 @@ data_t deque_pop(deque_t *deque) {
 int deque_size(deque_t *deque) {
     return deque->size;
 }
+
+void print_deque(deque_t *deque) {
+    node_t *curr = deque->head;
+    while(curr != NULL){
+        printf("%d\t", curr->data.process->pid);
+        curr = curr->next;
+    }
+    printf("\n");
+}
