@@ -82,17 +82,7 @@ void swap_pages(int *pages, int num_pages, int *space_available, process_t *proc
         }
     }
     // discard its pages from memory
-    int num_process_pages = process->mem_req / PAGE_SIZE;
-    int *mem_addresses = (int *) malloc(sizeof(*mem_addresses) * num_process_pages);
-    find_process_mem(pages, num_pages, least_recent_process, mem_addresses);
-
-    // Print
-    printf("%d, EVICTED, mem-addresses=[", simulation_time_elapsed);
-    for (int i = 0; i < num_process_pages - 1; i++) {
-        printf("%d,", mem_addresses[i]);
-    }
-    printf("%d]\n", mem_addresses[num_process_pages - 1]);
-    free(mem_addresses);
+    print_evicted(pages, num_pages, least_recent_process, simulation_time_elapsed);
     discard_pages(pages, num_pages, space_available, least_recent_process);
     //printf("Flushed memory\n");
     //print_memory(pages, num_pages);
@@ -121,18 +111,7 @@ void swap_pages(int *pages, int num_pages, int *space_available, process_t *proc
         }
 
         // discard its pages from memory
-         num_process_pages = process->mem_req / PAGE_SIZE;
-        mem_addresses = (int *) malloc(sizeof(*mem_addresses) * num_process_pages);
-        find_process_mem(pages, num_pages, least_recent_process, mem_addresses);
-
-        // Print
-        printf("%d, EVICTED, mem-addresses=[", simulation_time_elapsed);
-        for (int i = 0; i < num_process_pages - 1; i++) {
-            printf("%d,", mem_addresses[i]);
-        }
-        printf("%d]\n", mem_addresses[num_process_pages - 1]);
-        free(mem_addresses);
-
+        print_evicted(pages, num_pages, least_recent_process, simulation_time_elapsed);
         discard_pages(pages, num_pages, space_available, least_recent_process);
     }
     //free(least_recent_process);

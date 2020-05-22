@@ -8,6 +8,7 @@
 
 #include "process.h"
 #include "deque.h"
+#include "print_output.h"
 
 #define PAGE_SIZE 4
 

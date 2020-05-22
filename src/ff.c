@@ -159,17 +159,7 @@ void fc_fs(deque_t *pending_process_queue, deque_t *process_queue, char *memory_
                      */
                     if (!strstr(memory_opt, "u")) {
 
-                        int num_process_pages = process->mem_req / PAGE_SIZE;
-                        int *mem_addresses = (int *) malloc(sizeof(*mem_addresses) * num_process_pages);
-                        find_process_mem(pages, num_pages, process, mem_addresses);
-
-                        // Print
-                        printf("%d, EVICTED, mem-addresses=[", simulation_time_elapsed);
-                        for (int i = 0; i < num_process_pages - 1; i++) {
-                            printf("%d,", mem_addresses[i]);
-                        }
-                        printf("%d]\n", mem_addresses[num_process_pages - 1]);
-                        free(mem_addresses);
+                        print_evicted(pages, num_pages, process, simulation_time_elapsed);
 
                         discard_pages(pages, num_pages, &space_available, process);
                     }
