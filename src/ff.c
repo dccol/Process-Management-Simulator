@@ -253,10 +253,8 @@ void fc_fs(deque_t *pending_process_queue, deque_t *process_queue, char *memory_
 /**
  * abstraction of a unit of time (second)
  */
-void step_ff(deque_t *pending_process_queue, deque_t *process_queue, process_t *current_process,
-        int *simulation_time_elapsed, int *pages, int num_pages, int *space_available, char *memory_opt, int* state, int *loaded, int *loading_cost){
-
-
+void step_ff(deque_t *process_queue, process_t *current_process, int *simulation_time_elapsed, int *pages,
+        int num_pages, int *space_available, int* state, int *loaded, int *loading_cost){
 
     /**
      * IF LOADING => LOAD PROCESS PAGES INTO MEMORY
