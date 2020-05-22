@@ -37,6 +37,9 @@ void fc_fs(deque_t *pending_process_queue, deque_t *process_queue, char *memory_
     int throughput_min = 100;
     int throughput_max = 0;
 
+    double turnaround_av = 0;
+    int num_processes_finised = 0;
+
     /**
      * If the Memory option is not unlimited, initialize the memory data structure
      */
@@ -120,6 +123,9 @@ void fc_fs(deque_t *pending_process_queue, deque_t *process_queue, char *memory_
             data_t data = deque_remove(process_queue);
             process_t *process = data.process;
 
+            // Set start time of process
+            process->time_started = simulation_time_elapsed;
+
             /**
              * If memory option not unlimited
              */
@@ -164,9 +170,8 @@ void fc_fs(deque_t *pending_process_queue, deque_t *process_queue, char *memory_
                         &space_available, memory_opt, &state, &loaded, &loading_cost);
 
                 /**
-                 * If the Process is finished => Print output
+                 * If the Process is finished
                  */
-
                 if (process->time_remaining == 0) {
 
 
@@ -192,10 +197,26 @@ void fc_fs(deque_t *pending_process_queue, deque_t *process_queue, char *memory_
                     printf("%d, FINISHED, id=%d, proc-remaining=%d\n", simulation_time_elapsed,
                            process->pid, process_queue->size);
 
-                    // KEEP TRACK OF HOW MANY PROCESSES HAVE FINISHED IN THE INTERVAL
+                    /**
+                     * KEEP TRACK OF HOW MANY PROCESSES HAVE FINISHED IN THE INTERVAL
+                     */
                     interval_throughput++;
-                    //int interval_num = simulation_time_elapsed/60;
-                    //printf("Interval-Throughput of Interval %d = %d\n", interval_num, interval_throughput);
+
+                    /**
+                     * KEEP TRAKC OF HOW MANY PROCESSES HAVE FINSIHED TOTAL
+                     */
+                    num_processes_finised++;
+
+                    /**
+                     * Calculate TurnAround-time of the process
+                     */
+                    int turnaround_time = simulation_time_elapsed - process->time_rec;
+                    fprintf(stderr,"%d, TurnAround-time = %d\n", simulation_time_elapsed, turnaround_time);
+                    double turnaround_total = turnaround_av * (num_processes_finised-1);
+                    turnaround_av = (turnaround_total + turnaround_time)/num_processes_finised;
+                    fprintf(stderr,"%d, TurnAround-avg = %lf\n", simulation_time_elapsed, turnaround_av);
+
+
                 }
 
                 /**
@@ -232,6 +253,8 @@ void fc_fs(deque_t *pending_process_queue, deque_t *process_queue, char *memory_
             }
         }
     }
+
+    // Round up if decimal
     if((throughput_av - (int)throughput_av) != 0){
         throughput_av = round_up(throughput_av);
     }
@@ -239,6 +262,15 @@ void fc_fs(deque_t *pending_process_queue, deque_t *process_queue, char *memory_
         throughput_av = (int)throughput_av;
     }
     printf("Throughput%2.0lf, %d, %d\n", throughput_av, throughput_min, throughput_max);
+
+    // Round up if decimal
+    if((turnaround_av - (int)turnaround_av) != 0){
+        turnaround_av = round_up(turnaround_av);
+    }
+    else{
+        turnaround_av= (int)turnaround_av;
+    }
+    printf("Turnaround time %2.0lf\n", turnaround_av);
     printf("All Processes Complete\n");
     free(pages);
 }
@@ -310,8 +342,6 @@ void step_ff(deque_t *pending_process_queue, deque_t *process_queue, process_t *
      */
     else if(*state == RUNNING) {
 
-        // THIS IS WRONG, move out of step
-        current_process->time_started = *simulation_time_elapsed;
         //printf("Process %d beginning at time %d\n", current_process->pid, current_process->time_started);
         fprintf(stderr, "%d, RUNNING, id=%d, remaining-time=%d\n", *simulation_time_elapsed, current_process->pid, current_process->time_remaining);
         int status = run_process_ff(current_process);
