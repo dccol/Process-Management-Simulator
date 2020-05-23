@@ -106,7 +106,7 @@ void load_pages_v(int *pages, int num_pages, int *space_available, process_t *pr
      */
     process->occupying_memory = 1;
     print_memory(pages, num_pages);
-    printf("space_available after load: %d\n", *space_available);
+    //printf("space_available after load: %d\n", *space_available);
 }
 
 void swap_pages_v(int *pages, int num_pages, int *space_available, process_t *process, int pages_remaining,
@@ -145,7 +145,7 @@ void swap_pages_v(int *pages, int num_pages, int *space_available, process_t *pr
     }
     //printf("Flushed memory\n");
     print_memory(pages, num_pages);
-    printf("space_available after discard: %d\n", *space_available);
+    //printf("space_available after discard: %d\n", *space_available);
     fprintf(stderr, "\n");
 
     /**
@@ -161,7 +161,7 @@ void discard_pages_v(int *pages, int num_pages, int *space_available, process_t 
      * will also print the evicted output
      */
 
-    printf("pages remaining: %d\n", pages_remaining);
+    //printf("pages remaining: %d\n", pages_remaining);
     int *mem_addresses = (int *) malloc(sizeof(*mem_addresses) * (process->mem_req / PAGE_SIZE));
     int index = 0;
 
