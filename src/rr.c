@@ -371,7 +371,9 @@ void step_rr(deque_t *process_queue, process_t *current_process, int *simulation
             // Pass in total pages NOT already in memory
             int process_pages_req = (current_process->mem_req/PAGE_SIZE) - currently_in_mem;
             fprintf(stderr,"Process %d would like %d pages of memory\n", current_process->pid, process_pages_req);
-            if (currently_in_mem < 4 && currently_in_mem != (current_process->mem_req/PAGE_SIZE)){
+
+            // if currently not all the pages are in memory, check if we can load some more
+            if(currently_in_mem != (current_process->mem_req/PAGE_SIZE )){
 
                 /**
                  * LOAD
@@ -381,26 +383,52 @@ void step_rr(deque_t *process_queue, process_t *current_process, int *simulation
                 //fprintf(stderr,"Process %d would like %d pages of memory\n", current_process->pid, process_pages_req);
 
                 // Loading cost will be derived by how many pages were loaded
-                virtual_memory(pages, num_pages, space_available, current_process, process_queue,
+
+                int result = virtual_memory(pages, num_pages, space_available, current_process, process_queue,
                         *simulation_time_elapsed, process_pages_req, loading_cost);
-                /**
-                 * Once loading has occurred, apply page fault cost
-                 */
-                 currently_in_mem = count_process_mem(pages, num_pages, current_process);
-                 int pages_not_in_mem = (current_process->mem_req/PAGE_SIZE) - currently_in_mem;
-                 int page_fault_cost = pages_not_in_mem;
-                 current_process->time_remaining = current_process->time_remaining + page_fault_cost;
+
+                if(result == 1) {
+                    /**
+                     * Once loading has occurred, apply page fault cost
+                     */
+                    currently_in_mem = count_process_mem(pages, num_pages, current_process);
+                    int pages_not_in_mem = (current_process->mem_req / PAGE_SIZE) - currently_in_mem;
+                    int page_fault_cost = pages_not_in_mem;
+                    current_process->time_remaining = current_process->time_remaining + page_fault_cost;
 
 
+                    /**
+                     * PRINT TO STDOUT
+                     */
+                    print_load(pages, num_pages, space_available, current_process, loading_cost,
+                               simulation_time_elapsed);
+                }
                 /**
-                 * PRINT TO STDOUT
+                 * If no loading occured check if should change state
                  */
-                print_load(pages, num_pages, space_available, current_process, loading_cost, simulation_time_elapsed);
+                else{
+                    if (*loading_cost == 1) {
+                        *state = RUNNING;
+
+                    } else if (*loading_cost == 0) { // if we never tried to load anything because already in memory
+                        /**
+                         * PRINT
+                         */
+                        *state = RUNNING;
+                        print_load(pages, num_pages, space_available, current_process, loading_cost,
+                                   simulation_time_elapsed);
+
+                        /**
+                         * RETURN SO TICK DOESNT OCCUR
+                         */
+                        return;
+                    }
+                }
 
             }
+
             /**
-             *  if loading has been completed in the previous tick, tick until loading cost has been reached,
-             *  then change the state so that the next tick runs the process
+             *  if all pages are in memory, no loading occurs, check if state change
              */
             else {
                 if (*loading_cost == 1) {
