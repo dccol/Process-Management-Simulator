@@ -111,12 +111,12 @@ void swap_pages_v(int *pages, int num_pages, int *space_available, process_t *pr
             }
         }
         // discard its pages from memory
-        print_evicted(pages, num_pages, least_recent_process, simulation_time_elapsed);
+        //print_evicted(pages, num_pages, least_recent_process, simulation_time_elapsed);
 
         /**
          * CAREFUL ABOUT SETTING OCCUPYING MEMORY TO FALSE as some pages may still exist in memory
          */
-        discard_pages_v(pages, num_pages, space_available, least_recent_process);
+        discard_pages_v(pages, num_pages, space_available, least_recent_process, simulation_time_elapsed);
     }
     //printf("Flushed memory\n");
     //print_memory(pages, num_pages);
@@ -129,10 +129,15 @@ void swap_pages_v(int *pages, int num_pages, int *space_available, process_t *pr
     load_pages_v(pages, num_pages, space_available, process, pages_remaining, loading_cost);
 }
 
-void discard_pages_v(int *pages, int num_pages, int *space_available, process_t *process){
+void discard_pages_v(int *pages, int num_pages, int *space_available, process_t *process, int simulation_time_elapsed){
     /**
-     * DISCARD
+     * DISCARD,
+     * will also print the evicted output
      */
+
+    int *mem_addresses = (int *) malloc(sizeof(*mem_addresses) * (process->mem_req / PAGE_SIZE));
+    int index = 0;
+
     // remove process pages from memory until space available == 4
     int count = 0;
     int removed_count = 0;
@@ -147,6 +152,13 @@ void discard_pages_v(int *pages, int num_pages, int *space_available, process_t 
                 removed_count++;
                 *space_available = *space_available + 1;
 
+                // add it to evicted memory address
+                mem_addresses[index] = i;
+                //printf("MEMIndex %d\n", index);
+                index++;
+                //printf("Evicted page %d\n", i);
+
+
                 if (*space_available == 4) {
                     // set a flag to stop removing but continue to count
                     remove = 0;
@@ -160,6 +172,12 @@ void discard_pages_v(int *pages, int num_pages, int *space_available, process_t 
     if(count == removed_count) {
         process->occupying_memory = -1;
     }
+
+    /**
+     * Print Evicted
+     */
+
+    print_evicted(process, simulation_time_elapsed, mem_addresses, index);
 }
 
 int count_process_mem(const int *pages, int num_pages, process_t *process) {

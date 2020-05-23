@@ -153,9 +153,9 @@ void fc_fs(deque_t *pending_process_queue, deque_t *process_queue, char *memory_
                      */
                     if (!strstr(memory_opt, "u")) {
 
-                        print_evicted(pages, num_pages, process, simulation_time_elapsed);
+                        //print_evicted(pages, num_pages, process, simulation_time_elapsed);
 
-                        discard_pages(pages, num_pages, &space_available, process);
+                        discard_pages(pages, num_pages, &space_available, process, simulation_time_elapsed);
                     }
                     printf("%d, FINISHED, id=%d, proc-remaining=%d\n", simulation_time_elapsed,
                            process->pid, process_queue->size);
