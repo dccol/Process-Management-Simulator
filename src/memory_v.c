@@ -19,6 +19,9 @@ void virtual_memory(int *pages, int num_pages, int *space_available, process_t *
 
     fprintf(stderr,"Process %d would like %d pages of memory\n", process->pid, process_pages_req);
 
+    if(process_pages_req == 0){
+        return;
+    }
     /**
      * If enough space available load all specified pages
      */

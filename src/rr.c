@@ -363,10 +363,10 @@ void step_rr(deque_t *process_queue, process_t *current_process, int *simulation
         else if(strstr(memory_opt, "v")){
 
             /**
-             * If pages is < 4
+             * If pages is less than 4 and not all the process pages are currently in memory
              */
             int currently_in_mem = count_process_mem(pages, num_pages, current_process);
-            if (currently_in_mem < 4){
+            if (currently_in_mem < 4 && currently_in_mem != (current_process->mem_req/PAGE_SIZE)){
 
                 /**
                  * LOAD
