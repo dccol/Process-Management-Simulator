@@ -48,14 +48,27 @@ void virtual_memory(int *pages, int num_pages, int *space_available, process_t *
          */
         else {
             /**
-             * pass pages_remaining in to be 4 so that once 4 pages are available then it will break the discard process
+             * If we are swapping check to see if any of the processes pages are currently in memory
              */
             int pages_remaining;
+            int currently_in_mem = count_process_mem(pages, num_pages, process);
+            /**
+             * pass pages_remaining in to be 4 so that once 4 pages are available then it will break the discard process
+             */
+
+            // If the process is smaller than 4 then just free enough to fit it
             if(process_pages_req < 4){
                 pages_remaining = process_pages_req;
+                if(currently_in_mem != 0){
+                    pages_remaining = pages_remaining - currently_in_mem;
+                }
             }
+
             else{
                 pages_remaining = 4;
+                if(currently_in_mem != 0){
+                    pages_remaining = pages_remaining - currently_in_mem;
+                }
             }
             swap_pages_v(pages, num_pages, space_available, process, pages_remaining, process_queue, simulation_time_elapsed, loading_cost);
         }
@@ -116,7 +129,7 @@ void swap_pages_v(int *pages, int num_pages, int *space_available, process_t *pr
         /**
          * CAREFUL ABOUT SETTING OCCUPYING MEMORY TO FALSE as some pages may still exist in memory
          */
-        discard_pages_v(pages, num_pages, space_available, least_recent_process, simulation_time_elapsed);
+        discard_pages_v(pages, num_pages, space_available, least_recent_process, simulation_time_elapsed, pages_remaining);
     }
     //printf("Flushed memory\n");
     print_memory(pages, num_pages);
@@ -129,9 +142,9 @@ void swap_pages_v(int *pages, int num_pages, int *space_available, process_t *pr
     load_pages_v(pages, num_pages, space_available, process, pages_remaining, loading_cost);
 }
 
-void discard_pages_v(int *pages, int num_pages, int *space_available, process_t *process, int simulation_time_elapsed){
+void discard_pages_v(int *pages, int num_pages, int *space_available, process_t *process, int simulation_time_elapsed, int pages_remaining){
     /**
-     * DISCARD,
+     * DISCARD until space_available == pages_remaining
      * will also print the evicted output
      */
 
@@ -158,8 +171,10 @@ void discard_pages_v(int *pages, int num_pages, int *space_available, process_t 
                 index++;
                 //printf("Evicted page %d\n", i);
 
-
-                if (*space_available == 4) {
+                /**
+                 * If we not have space to load the specified number of pages, stop discarding
+                 */
+                if (*space_available == pages_remaining) {
                     // set a flag to stop removing but continue to count
                     remove = 0;
                 }
