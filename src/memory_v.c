@@ -17,13 +17,16 @@ void virtual_memory(int *pages, int num_pages, int *space_available, process_t *
      *      if not at least 4 empty pages (space_available < 4) => remove least recent by by page until space_available == 4;
      */
 
-
-    if(process_pages_req == 0){
-        return;
-    }
     /**
      * If enough space available load all specified pages
      */
+
+    //printf("process_pages_req: %d\n", process_pages_req);
+    //printf("space_available: %d\n", *space_available);
+    //printf("loading_cost: %d\n", *loading_cost);
+
+
+
     if(process_pages_req <= *space_available) {
 
         load_pages_v(pages, num_pages, space_available, process, process_pages_req, loading_cost);
@@ -59,7 +62,7 @@ void virtual_memory(int *pages, int num_pages, int *space_available, process_t *
              */
 
             // If the process is smaller than 4 then just free enough to fit it
-            if(process_pages_req < 4){
+            if((process->mem_req/PAGE_SIZE) < 4){
                 pages_remaining = process_pages_req;
                 if(currently_in_mem != 0){
                     pages_remaining = pages_remaining - currently_in_mem;
@@ -72,6 +75,7 @@ void virtual_memory(int *pages, int num_pages, int *space_available, process_t *
                     pages_remaining = pages_remaining - currently_in_mem;
                 }
             }
+            //printf("pages remaining: %d\n", pages_remaining);
             swap_pages_v(pages, num_pages, space_available, process, pages_remaining, process_queue, simulation_time_elapsed, loading_cost);
         }
     }
@@ -97,6 +101,7 @@ void load_pages_v(int *pages, int num_pages, int *space_available, process_t *pr
      */
     process->occupying_memory = 1;
     print_memory(pages, num_pages);
+    //printf("space_available after load: %d\n", *space_available);
 }
 
 void swap_pages_v(int *pages, int num_pages, int *space_available, process_t *process, int pages_remaining,
@@ -135,6 +140,7 @@ void swap_pages_v(int *pages, int num_pages, int *space_available, process_t *pr
     }
     //printf("Flushed memory\n");
     print_memory(pages, num_pages);
+    //printf("space_available after discard: %d\n", *space_available);
     fprintf(stderr, "\n");
 
     /**
@@ -150,6 +156,7 @@ void discard_pages_v(int *pages, int num_pages, int *space_available, process_t 
      * will also print the evicted output
      */
 
+    //printf("pages remaining: %d\n", pages_remaining);
     int *mem_addresses = (int *) malloc(sizeof(*mem_addresses) * (process->mem_req / PAGE_SIZE));
     int index = 0;
 

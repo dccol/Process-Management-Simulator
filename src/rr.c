@@ -221,6 +221,7 @@ void rr(deque_t *pending_process_queue, deque_t *process_queue, char *memory_opt
                         //print_evicted(pages, num_pages, process, simulation_time_elapsed);
 
                         discard_pages(pages, num_pages, &space_available, process, simulation_time_elapsed);
+                        print_memory(pages, num_pages);
                     }
 
                     /**
