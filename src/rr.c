@@ -146,18 +146,18 @@ void rr(deque_t *pending_process_queue, deque_t *process_queue, char *memory_opt
                  * IF NOT AT LEAST 4 PAGES IN MEMORY
                  */
                 int currently_in_mem = count_process_mem(pages, num_pages, process);
-                if (currently_in_mem < 4){
-                    /**
-                     * Set STATE to LOADING
-                     */
-                    state = LOADING;
+                //if (currently_in_mem < 4){
+                /**
+                 * Set STATE to LOADING
+                 */
+                state = LOADING;
 
-                    /**
-                     * Loading cost will depend on how many pages virtual memory can store
-                     * set to 0 as if all pages are already stored, we will not enter virtual memory
-                     */
-                    loading_cost = 0;
-                }
+                /**
+                 * Loading cost will depend on how many pages virtual memory can store
+                 * set to 0 as if all pages are already stored, we will not enter virtual memory
+                 */
+                loading_cost = 0;
+                //}
                 /**
                  * IF MORE THAN 4 PAGES IN MEMORY ALREADY WE ARE STILL GOING TO TRY AND LOAD THE REST
                  */
@@ -340,7 +340,7 @@ void step_rr(deque_t *process_queue, process_t *current_process, int *simulation
 
                 } else if (*loading_cost == 0) {
                     /**
-                     * PRINTTTTTTT
+                     * PRINT
                      */
                     *state = RUNNING;
                     print_load(pages, num_pages, space_available, current_process, loading_cost,
@@ -365,14 +365,19 @@ void step_rr(deque_t *process_queue, process_t *current_process, int *simulation
             /**
              * If pages is less than 4 and not all the process pages are currently in memory
              */
+
             int currently_in_mem = count_process_mem(pages, num_pages, current_process);
+            // Pass in total pages NOT already in memory
+            int process_pages_req = (current_process->mem_req/PAGE_SIZE) - currently_in_mem;
+            fprintf(stderr,"Process %d would like %d pages of memory\n", current_process->pid, process_pages_req);
             if (currently_in_mem < 4 && currently_in_mem != (current_process->mem_req/PAGE_SIZE)){
 
                 /**
                  * LOAD
                  */
                 // Pass in total pages NOT already in memory
-                int process_pages_req = (current_process->mem_req/PAGE_SIZE) - currently_in_mem;
+                //int process_pages_req = (current_process->mem_req/PAGE_SIZE) - currently_in_mem;
+                //fprintf(stderr,"Process %d would like %d pages of memory\n", current_process->pid, process_pages_req);
 
                 // Loading cost will be derived by how many pages were loaded
                 virtual_memory(pages, num_pages, space_available, current_process, process_queue,
@@ -384,6 +389,7 @@ void step_rr(deque_t *process_queue, process_t *current_process, int *simulation
                  int pages_not_in_mem = (current_process->mem_req/PAGE_SIZE) - currently_in_mem;
                  int page_fault_cost = pages_not_in_mem;
                  current_process->time_remaining = current_process->time_remaining + page_fault_cost;
+
 
                 /**
                  * PRINT TO STDOUT
