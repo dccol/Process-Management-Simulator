@@ -363,20 +363,27 @@ void step_rr(deque_t *process_queue, process_t *current_process, int *simulation
         else if(strstr(memory_opt, "v")){
 
             /**
-             * Always try and load pages, unless all pages already stored
+             * If pages is < 4
              */
             int currently_in_mem = count_process_mem(pages, num_pages, current_process);
-            if (currently_in_mem != current_process->mem_req/PAGE_SIZE){
+            if (currently_in_mem < 4){
 
                 /**
                  * LOAD
                  */
                 // Pass in total pages NOT already in memory
-                int process_pages_req = current_process->mem_req / PAGE_SIZE - currently_in_mem;
+                int process_pages_req = (current_process->mem_req/PAGE_SIZE) - currently_in_mem;
 
                 // Loading cost will be derived by how many pages were loaded
                 virtual_memory(pages, num_pages, space_available, current_process, process_queue,
                         *simulation_time_elapsed, process_pages_req, loading_cost);
+                /**
+                 * Once loading has occurred, apply page fault cost
+                 */
+                 currently_in_mem = count_process_mem(pages, num_pages, current_process);
+                 int pages_not_in_mem = (current_process->mem_req/PAGE_SIZE) - currently_in_mem;
+                 int page_fault_cost = pages_not_in_mem;
+                 current_process->time_remaining = current_process->time_remaining + page_fault_cost;
 
                 /**
                  * PRINT TO STDOUT

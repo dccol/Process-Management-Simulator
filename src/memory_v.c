@@ -17,7 +17,7 @@ void virtual_memory(int *pages, int num_pages, int *space_available, process_t *
      *      if not at least 4 empty pages (space_available < 4) => remove least recent by by page until space_available == 4;
      */
 
-    //printf("Process %d needs %d pages of memory\n", process->pid, process_pages_req);
+    fprintf(stderr,"Process %d would like %d pages of memory\n", process->pid, process_pages_req);
 
     /**
      * If enough space available load all specified pages
@@ -81,7 +81,7 @@ void load_pages_v(int *pages, int num_pages, int *space_available, process_t *pr
      * Set occupying memory to true
      */
     process->occupying_memory = 1;
-    //print_memory(pages, num_pages);
+    print_memory(pages, num_pages);
 }
 
 void swap_pages_v(int *pages, int num_pages, int *space_available, process_t *process, int pages_remaining,
@@ -119,8 +119,8 @@ void swap_pages_v(int *pages, int num_pages, int *space_available, process_t *pr
         discard_pages_v(pages, num_pages, space_available, least_recent_process, simulation_time_elapsed);
     }
     //printf("Flushed memory\n");
-    //print_memory(pages, num_pages);
-    //printf("\n");
+    print_memory(pages, num_pages);
+    fprintf(stderr, "\n");
 
     /**
      * Once there is enough space available to store all process' pages, load them

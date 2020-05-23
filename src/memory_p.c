@@ -122,7 +122,7 @@ void discard_pages(int *pages, int num_pages, int *space_available, process_t *p
 
 void print_memory(int *pages, int num_pages){
     for(int i = 0; i < num_pages; i++){
-        printf("Page %2d: %2d\n", i, pages[i]);
+        fprintf(stderr, "Page %2d: %2d\n", i, pages[i]);
     }
 }
 void find_process_mem(int *pages, int num_pages, process_t *process, int *mem_addresses) {

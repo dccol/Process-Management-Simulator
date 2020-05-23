@@ -2,9 +2,6 @@
 #include "print_output.h"
 
 void print_evicted(process_t *process, int simulation_time_elapsed, int *mem_addresses, int mem_addresses_len){
-    int num_process_pages = process->mem_req / PAGE_SIZE;
-    //int *mem_addresses = (int *) malloc(sizeof(*mem_addresses) * num_process_pages);
-    //find_process_mem(pages, num_pages, process, mem_addresses);
 
     // Print
     printf("%d, EVICTED, mem-addresses=[", simulation_time_elapsed);
