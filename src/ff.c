@@ -258,7 +258,6 @@ void step_ff(deque_t *process_queue, process_t *current_process, int *simulation
          *  if loading has been completed in the previous tick, tick until loading cost has been reached,
          *  then change the state so that the next tick runs the process
          */
-
         else{
             if(*loading_cost == 1) {
                 *state = RUNNING;

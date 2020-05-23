@@ -289,8 +289,10 @@ void step_rr(deque_t *process_queue, process_t *current_process, int *simulation
             print_load(pages, num_pages, space_available, current_process, loading_cost, simulation_time_elapsed);
 
         }
-        // if loading has been completed in the previous tick, tick until loading cost has been reached,
-        // then change the state so that the next tick runs the process
+        /**
+         *  if loading has been completed in the previous tick, tick until loading cost has been reached,
+         *  then change the state so that the next tick runs the process
+         */
         else{
             if(*loading_cost == 1) {
                 *state = RUNNING;

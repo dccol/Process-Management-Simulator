@@ -58,63 +58,37 @@ void load_pages(int *pages, int num_pages, int *space_available, process_t *proc
 
 void swap_pages(int *pages, int num_pages, int *space_available, process_t *process, int pages_remaining, deque_t *process_queue, int simulation_time_elapsed){
 
-    // find the process least recently executed and replace its pages
-    // how to find the process least recently executed?
-    // the first visited!!!! process in the process queue
-
     //printf("Swapping pages\n");
     //printf("Pages remaining: %d\n", pages_remaining);
 
-    /**
-     * determine least recent process
-     */
     process_t *least_recent_process = new_process();
 
     node_t *curr = process_queue->foot;
-    while (curr != NULL) {
-        //printf("curr process: Process %d\n", curr->data.process->pid);
-        if (curr->data.process->time_started != -1 && curr->data.process->occupying_memory != -1) {
-            least_recent_process = curr->data.process;
-            //printf("least recent process: Process %d\n", least_recent_process->pid);
-            break;
-        } else { // if the process at the front of the queue has not yet been executed, there is no memory to replace
-            curr = curr->prev;
-        }
-    }
-    // discard its pages from memory
-    print_evicted(pages, num_pages, least_recent_process, simulation_time_elapsed);
-    discard_pages(pages, num_pages, space_available, least_recent_process);
-    //printf("Flushed memory\n");
-    //print_memory(pages, num_pages);
-    //printf("\n");
 
-    // call function again?
-
-    // in memory tag on processes
     /**
-     * If we return from this and there is still not enough space we will continue back tracking in the queue to find
-     * the next least recently executed process and remove it's pages also
+     * While there is not enough space to store all the pages
      */
     while(pages_remaining > *space_available) {
-
-        // determine the least recently executed process
-        assert(curr != NULL);
-        curr = curr->prev;
+        /**
+         * Determine the least recent process and discard its pages from memory
+         */
         while (curr != NULL) {
-
+            //printf("curr process: Process %d\n", curr->data.process->pid);
             if (curr->data.process->time_started != -1 && curr->data.process->occupying_memory != -1) {
-
-                least_recent_process = process_queue->foot->data.process;
+                least_recent_process = curr->data.process;
+                //printf("least recent process: Process %d\n", least_recent_process->pid);
+                break;
             } else { // if the process at the front of the queue has not yet been executed, there is no memory to replace
                 curr = curr->prev;
             }
         }
-
         // discard its pages from memory
         print_evicted(pages, num_pages, least_recent_process, simulation_time_elapsed);
         discard_pages(pages, num_pages, space_available, least_recent_process);
     }
-    //free(least_recent_process);
+    //printf("Flushed memory\n");
+    //print_memory(pages, num_pages);
+    //printf("\n");
 
     /**
      * Once there is enough space available to store all process' pages, load them
