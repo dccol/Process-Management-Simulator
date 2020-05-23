@@ -29,11 +29,6 @@ void initialize_empty_pages(int *pages, int num_pages){
 
 void load_pages(int *pages, int num_pages, int *space_available, process_t *process, int pages_remaining, deque_t *process_queue) {
 
-    //int process_pages_req = process->mem_req / PAGE_SIZE;
-    //int pages_remaining = process_pages_req;
-
-    // find the next empty page !!
-    //int pages_loaded = 0;
     for (int i = 0; i < num_pages; i++) {
         if(pages[i] == -1) {
 
@@ -50,10 +45,7 @@ void load_pages(int *pages, int num_pages, int *space_available, process_t *proc
      */
     process->occupying_memory = 1;
     //print_memory(pages, num_pages);
-    /*if (pages_remaining != 0) {
 
-        swap_pages(pages, num_pages, space_available, process, pages_remaining, process_queue);
-    }*/
 }
 
 void swap_pages(int *pages, int num_pages, int *space_available, process_t *process, int pages_remaining, deque_t *process_queue, int simulation_time_elapsed){
@@ -62,9 +54,7 @@ void swap_pages(int *pages, int num_pages, int *space_available, process_t *proc
     //printf("Pages remaining: %d\n", pages_remaining);
 
     process_t *least_recent_process = new_process();
-
     node_t *curr = process_queue->foot;
-
     /**
      * While there is not enough space to store all the pages
      */
@@ -78,7 +68,8 @@ void swap_pages(int *pages, int num_pages, int *space_available, process_t *proc
                 least_recent_process = curr->data.process;
                 //printf("least recent process: Process %d\n", least_recent_process->pid);
                 break;
-            } else { // if the process at the front of the queue has not yet been executed, there is no memory to replace
+            }
+            else { // if the process at the front of the queue has not yet been executed, there is no memory to replace
                 curr = curr->prev;
             }
         }
@@ -93,24 +84,8 @@ void swap_pages(int *pages, int num_pages, int *space_available, process_t *proc
     /**
      * Once there is enough space available to store all process' pages, load them
      */
-
-    /**
-     * LOAD
-     */
-
     //printf("Enough spcace, load pages\n");
     load_pages(pages, num_pages, space_available, process, pages_remaining, process_queue);
-    // fil the pages with the process to be executed pages
-    /*for(int i = 0; i < num_pages; i++){
-        if(pages[i] == -1){
-            pages[i] = process->pid;
-            pages_remaining--;
-            space_available--;
-            if(pages_remaining == 0){
-                break;
-            }
-        }
-    }*/
 }
 
 void discard_pages(int *pages, int num_pages, int *space_available, process_t *process){

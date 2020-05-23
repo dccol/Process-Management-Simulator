@@ -82,7 +82,7 @@ void rr(deque_t *pending_process_queue, deque_t *process_queue, char *memory_opt
 
             int quantum_rr = quantum;
             step_rr(process_queue, place_holder_process, &simulation_time_elapsed, pages, num_pages,
-                    &space_available, &state, &loading_cost, &quantum_rr, &status);
+                    &space_available, &state, &loading_cost, &quantum_rr, &status, memory_opt);
 
             /**
              * If interval is over calculate the throughput values
@@ -114,7 +114,7 @@ void rr(deque_t *pending_process_queue, deque_t *process_queue, char *memory_opt
             }
 
             /**
-             * If memory option not unlimited
+             * If memory option is swapping-x, set state to loading if process not already in memory
              */
             if (strstr(memory_opt, "p")) {
 
@@ -136,8 +136,32 @@ void rr(deque_t *pending_process_queue, deque_t *process_queue, char *memory_opt
                     loading_cost = 0;
                 }
             }
+            /**
+             * If memory option is virtual memory,
+             */
             else if (strstr(memory_opt, "v")) {
-                // virtual memory
+
+                //printf("Virtual Memory\n");
+                /**
+                 * IF NOT AT LEAST 4 PAGES IN MEMORY
+                 */
+                int currently_in_mem = count_process_mem(pages, num_pages, process);
+                if (currently_in_mem < 4){
+                    /**
+                     * Set STATE to LOADING
+                     */
+                    state = LOADING;
+
+                    /**
+                     * Loading cost will depend on how many pages virtual memory can store
+                     * set to 0 as if all pages are already stored, we will not enter virtual memory
+                     */
+                    loading_cost = 0;
+                }
+                /**
+                 * IF MORE THAN 4 PAGES IN MEMORY ALREADY WE ARE STILL GOING TO TRY AND LOAD THE REST
+                 */
+
             }
             else{ // If memory is unlimited
                 state = RUNNING;
@@ -162,7 +186,7 @@ void rr(deque_t *pending_process_queue, deque_t *process_queue, char *memory_opt
             while (process->time_remaining > 0 && quantum_rr > 0) {
 
                 step_rr(process_queue, process, &simulation_time_elapsed, pages, num_pages,
-                        &space_available, &state, &loading_cost, &quantum_rr, &status);
+                        &space_available, &state, &loading_cost, &quantum_rr, &status, memory_opt);
 
                 /**
                  * If a process has been received at current simulation time, insert it into the process queue (transfer from pending queue)
@@ -195,6 +219,10 @@ void rr(deque_t *pending_process_queue, deque_t *process_queue, char *memory_opt
 
                         discard_pages(pages, num_pages, &space_available, process);
                     }
+
+                    /**
+                     * PRINT FINISHED OUTPUT
+                     */
                     printf("%d, FINISHED, id=%d, proc-remaining=%d\n", simulation_time_elapsed,
                            process->pid, process_queue->size);
 
@@ -204,7 +232,7 @@ void rr(deque_t *pending_process_queue, deque_t *process_queue, char *memory_opt
                     interval_throughput++;
 
                     /**
-                     * KEEP TRACK OF HOW MANY PROCESSES HAVE FINSIHED TOTAL
+                     * KEEP TRACK OF HOW MANY PROCESSES HAVE FINISHED TOTAL
                      */
                     num_processes_finished++;
 
@@ -267,51 +295,119 @@ void rr(deque_t *pending_process_queue, deque_t *process_queue, char *memory_opt
  * abstraction of a unit of time (second)
  */
 void step_rr(deque_t *process_queue, process_t *current_process, int *simulation_time_elapsed,int *pages,
-        int num_pages, int *space_available, int *state, int *loading_cost, int *quantum_rr, int *status){
+        int num_pages, int *space_available, int *state, int *loading_cost, int *quantum_rr, int *status, char *memory_opt){
 
-    if(*state == LOADING){
+    /**
+     * only thing that will change will be the loading section
+     */
+    if(*state == LOADING) {
 
-        // decrement time takes to load
+
         fprintf(stderr, "%d, RUNNING, id=%d, remaining-time=%d, load-time=%d\n",
                 *simulation_time_elapsed, current_process->pid, current_process->time_remaining, *loading_cost);
 
 
         /**
-         * If the process is not currently occupying memory, load
+         * If memory option is swapping-x
          */
-        if(current_process->occupying_memory == -1) {
+        if (strstr(memory_opt, "p")) {
 
-            swapping_x(pages, num_pages, space_available, current_process, process_queue, *simulation_time_elapsed);
+
 
             /**
-             * PRINT TO STDOUT
+             * If the process is not currently occupying memory, load
              */
-            print_load(pages, num_pages, space_available, current_process, loading_cost, simulation_time_elapsed);
+            if (current_process->occupying_memory == -1) {
 
-        }
-        /**
-         *  if loading has been completed in the previous tick, tick until loading cost has been reached,
-         *  then change the state so that the next tick runs the process
-         */
-        else{
-            if(*loading_cost == 1) {
-                *state = RUNNING;
+                swapping_x(pages, num_pages, space_available, current_process, process_queue, *simulation_time_elapsed);
 
-            } else if (*loading_cost == 0){
                 /**
-                 * PRINTTTTTTT
+                 * PRINT TO STDOUT
                  */
-                *state = RUNNING;
                 print_load(pages, num_pages, space_available, current_process, loading_cost, simulation_time_elapsed);
 
-                /**
-                 * RETURN SO TICK DOESNT OCCUR
-                 */
-                return;
             }
+                /**
+                 *  if loading has been completed in the previous tick, tick until loading cost has been reached,
+                 *  then change the state so that the next tick runs the process
+                 */
+            else {
+                if (*loading_cost == 1) {
+                    *state = RUNNING;
+
+                } else if (*loading_cost == 0) {
+                    /**
+                     * PRINTTTTTTT
+                     */
+                    *state = RUNNING;
+                    print_load(pages, num_pages, space_available, current_process, loading_cost,
+                               simulation_time_elapsed);
+
+                    /**
+                     * RETURN SO TICK DOESNT OCCUR
+                     */
+                    return;
+                }
+            }
+
+            // decrement loading time
+            *loading_cost = *loading_cost - 1;
         }
 
-        *loading_cost = *loading_cost - 1;
+        /**
+         * If memory option is virtual memory
+         */
+        else if(strstr(memory_opt, "v")){
+
+            /**
+             * Always try and load pages, unless all pages already stored
+             */
+            int currently_in_mem = count_process_mem(pages, num_pages, current_process);
+            if (currently_in_mem != current_process->mem_req/PAGE_SIZE){
+
+                /**
+                 * LOAD
+                 */
+                // Pass in total pages NOT already in memory
+                int process_pages_req = current_process->mem_req / PAGE_SIZE - currently_in_mem;
+
+                // Loading cost will be derived by how many pages were loaded
+                virtual_memory(pages, num_pages, space_available, current_process, process_queue,
+                        *simulation_time_elapsed, process_pages_req, loading_cost);
+
+                /**
+                 * PRINT TO STDOUT
+                 */
+                print_load(pages, num_pages, space_available, current_process, loading_cost, simulation_time_elapsed);
+
+            }
+            /**
+             *  if loading has been completed in the previous tick, tick until loading cost has been reached,
+             *  then change the state so that the next tick runs the process
+             */
+            else {
+                if (*loading_cost == 1) {
+                    *state = RUNNING;
+
+                } else if (*loading_cost == 0) { // if we never tried to load anything because already in memory
+                    /**
+                     * PRINT
+                     */
+                    *state = RUNNING;
+                    print_load(pages, num_pages, space_available, current_process, loading_cost,
+                               simulation_time_elapsed);
+
+                    /**
+                     * RETURN SO TICK DOESNT OCCUR
+                     */
+                    return;
+                }
+            }
+
+            // decrement loading time
+            *loading_cost = *loading_cost - 1;
+        }
+
     }
 
     /**
