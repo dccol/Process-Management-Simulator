@@ -7,7 +7,9 @@
 
 #include "process.h"
 #include "memory_p.h"
+#include "memory_v.h"
 #include "round.h"
+
 
 void print_evicted(process_t *process, int simulation_time_elapsed, int *mem_addresses, int mem_addresses_len);
 
