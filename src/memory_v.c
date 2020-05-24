@@ -156,6 +156,8 @@ void swap_pages_v(int *pages, int num_pages, int *space_available, process_t *pr
      */
     //printf("Enough space, load pages\n");
     load_pages_v(pages, num_pages, space_available, process, pages_remaining, loading_cost);
+
+    insertion_sort_evicted(mem_addresses, mem_addresses_len);
     print_evicted(process, simulation_time_elapsed, mem_addresses, mem_addresses_len);
 }
 
