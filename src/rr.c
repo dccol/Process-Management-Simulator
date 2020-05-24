@@ -141,12 +141,6 @@ void rr(deque_t *pending_process_queue, deque_t *process_queue, char *memory_opt
              */
             else if (strstr(memory_opt, "v")) {
 
-                //printf("Virtual Memory\n");
-                /**
-                 * IF NOT AT LEAST 4 PAGES IN MEMORY
-                 */
-                int currently_in_mem = count_process_mem(pages, num_pages, process);
-                //if (currently_in_mem < 4){
                 /**
                  * Set STATE to LOADING
                  */
@@ -154,14 +148,9 @@ void rr(deque_t *pending_process_queue, deque_t *process_queue, char *memory_opt
 
                 /**
                  * Loading cost will depend on how many pages virtual memory can store
-                 * set to 0 as if all pages are already stored, we will not enter virtual memory
+                 * set to 0 as if all pages are already stored, we will
                  */
                 loading_cost = 0;
-                //}
-                /**
-                 * IF MORE THAN 4 PAGES IN MEMORY ALREADY WE ARE STILL GOING TO TRY AND LOAD THE REST
-                 */
-
             }
             else{ // If memory is unlimited
                 state = RUNNING;
@@ -214,11 +203,6 @@ void rr(deque_t *pending_process_queue, deque_t *process_queue, char *memory_opt
                      * IF NOT USING UNLIMITED MEMORY REMOVE PROCESS FROM MEMORY
                      */
                     if (!strstr(memory_opt, "u")) {
-
-                        /**
-                         * COME BACK TO OTHER DISCARD PAGES
-                         */
-                        //print_evicted(pages, num_pages, process, simulation_time_elapsed);
 
                         discard_pages(pages, num_pages, &space_available, process, simulation_time_elapsed);
                         print_memory(pages, num_pages);
