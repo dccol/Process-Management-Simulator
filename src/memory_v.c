@@ -115,6 +115,9 @@ void swap_pages_v(int *pages, int num_pages, int *space_available, process_t *pr
     //printf("Swapping pages\n");
     //printf("Pages remaining: %d\n", pages_remaining);
 
+    int *mem_addresses = (int *) malloc(sizeof(*mem_addresses) * (process->mem_req / PAGE_SIZE));
+    int mem_addresses_len = 0;
+
     process_t *least_recent_process = new_process();
     node_t *curr = process_queue->foot;
     /**
@@ -141,7 +144,7 @@ void swap_pages_v(int *pages, int num_pages, int *space_available, process_t *pr
         /**
          * CAREFUL ABOUT SETTING OCCUPYING MEMORY TO FALSE as some pages may still exist in memory
          */
-        discard_pages_v(pages, num_pages, space_available, least_recent_process, simulation_time_elapsed, pages_remaining);
+        discard_pages_v(pages, num_pages, space_available, least_recent_process, simulation_time_elapsed, pages_remaining, mem_addresses, &mem_addresses_len);
     }
     //printf("Flushed memory\n");
     print_memory(pages, num_pages);
@@ -153,17 +156,17 @@ void swap_pages_v(int *pages, int num_pages, int *space_available, process_t *pr
      */
     //printf("Enough space, load pages\n");
     load_pages_v(pages, num_pages, space_available, process, pages_remaining, loading_cost);
+    print_evicted(process, simulation_time_elapsed, mem_addresses, mem_addresses_len);
 }
 
-void discard_pages_v(int *pages, int num_pages, int *space_available, process_t *process, int simulation_time_elapsed, int pages_remaining){
+void discard_pages_v(int *pages, int num_pages, int *space_available, process_t *process, int simulation_time_elapsed, int pages_remaining, int *mem_addresses, int *mem_addresses_len){
     /**
      * DISCARD until space_available == pages_remaining
      * will also print the evicted output
      */
 
     //printf("pages remaining: %d\n", pages_remaining);
-    int *mem_addresses = (int *) malloc(sizeof(*mem_addresses) * (process->mem_req / PAGE_SIZE));
-    int index = 0;
+    //int *mem_addresses = (int *) malloc(sizeof(*mem_addresses) * (process->mem_req / PAGE_SIZE));
 
     // remove process pages from memory until space available == 4
     int count = 0;
@@ -180,9 +183,9 @@ void discard_pages_v(int *pages, int num_pages, int *space_available, process_t 
                 *space_available = *space_available + 1;
 
                 // add it to evicted memory address
-                mem_addresses[index] = i;
+                mem_addresses[*mem_addresses_len] = i;
                 //printf("MEMIndex %d\n", index);
-                index++;
+                *mem_addresses_len = *mem_addresses_len + 1;
                 //printf("Evicted page %d\n", i);
 
                 /**
@@ -206,7 +209,7 @@ void discard_pages_v(int *pages, int num_pages, int *space_available, process_t 
      * Print Evicted
      */
 
-    print_evicted(process, simulation_time_elapsed, mem_addresses, index);
+    //print_evicted(process, simulation_time_elapsed, mem_addresses, index);
 }
 
 int count_process_mem(const int *pages, int num_pages, process_t *process) {
