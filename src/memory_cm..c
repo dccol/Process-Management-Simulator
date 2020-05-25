@@ -1,4 +1,5 @@
 
+#include "memory_cm.h"
 
 int swapping_oldest(int *pages, int num_pages, int *space_available, process_t *process, deque_t *process_queue,
                    int simulation_time_elapsed, int process_pages_req, int *loading_cost){
@@ -161,7 +162,8 @@ void swap_pages_cm(int *pages, int num_pages, int *space_available, process_t *p
     print_evicted(process, simulation_time_elapsed, mem_addresses, mem_addresses_len);
 }
 
-void discard_pages_cm(int *pages, int num_pages, int *space_available, process_t *process, int simulation_time_elapsed, int pages_remaining, int *mem_addresses, int *mem_addresses_len){
+void discard_pages_cm(int *pages, int num_pages, int *space_available, process_t *process,
+        int simulation_time_elapsed, int pages_remaining, int *mem_addresses, int *mem_addresses_len){
     /**
      * DISCARD until space_available == pages_remaining
      * will also print the evicted output
