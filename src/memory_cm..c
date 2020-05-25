@@ -125,7 +125,6 @@ void swap_pages_cm(int *pages, int num_pages, int *space_available, process_t *p
     int *mem_addresses = (int *) malloc(sizeof(*mem_addresses) * (process->mem_req / PAGE_SIZE));
     int mem_addresses_len = 0;
 
-    process_t *least_recent_process = new_process();
     /**
      * While there is not enough space to store either minimum pages or all pages if page req is < 4
      */
