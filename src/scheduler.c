@@ -8,10 +8,18 @@
 #include "process.h"
 #include "ff.h"
 #include "rr.h"
+#include "sf.h"
 
 #define DEBUG 0
 
 #define MAX_CHAR 1000
+
+/**
+ * TO DO
+ * round decimals for overhead
+ * @param processes_file
+ * @param pending_process_queue
+ */
 
 void initialize_queue(FILE *processes_file, deque_t *pending_process_queue);
 
@@ -83,6 +91,9 @@ int main(int argc, char **argv) {
     }
     else if(strstr(schedule_alg, "ff")) {
         fc_fs(pending_process_queue, process_queue, memory_opt, memory_size);
+    }
+    else if(strstr(schedule_alg, "sf")){
+        sf(pending_process_queue, process_queue, memory_opt, memory_size);
     }
     free_deque(pending_process_queue);
     free_deque(process_queue);
