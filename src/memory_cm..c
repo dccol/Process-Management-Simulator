@@ -2,7 +2,7 @@
 #include "memory_cm.h"
 
 int swapping_oldest(int *pages, int num_pages, int *space_available, process_t *process, deque_t *process_queue,
-                   int simulation_time_elapsed, int process_pages_req, int *loading_cost){
+                   int simulation_time_elapsed, int process_pages_req, int *loading_cost, int *pages_time){
 
     /**
      * WHAT IF ALL PAGES ALREADY LOADED
@@ -35,7 +35,7 @@ int swapping_oldest(int *pages, int num_pages, int *space_available, process_t *
 
     if(process_pages_req <= *space_available) {
 
-        load_pages_v(pages, num_pages, space_available, process, process_pages_req, loading_cost);
+        load_pages_cm(pages, num_pages, space_available, process, process_pages_req, loading_cost, pages_time);
     }
         /**
          * if not enough space available
@@ -51,7 +51,7 @@ int swapping_oldest(int *pages, int num_pages, int *space_available, process_t *
              * fill as much space as available
              */
             int pages_remaining = *space_available;
-            load_pages_v(pages, num_pages, space_available, process, pages_remaining, loading_cost);
+            load_pages_cm(pages, num_pages, space_available, process, pages_remaining, loading_cost, pages_time);
         }
             /**
              * if not enough room to fit minimum requirement,
@@ -82,13 +82,14 @@ int swapping_oldest(int *pages, int num_pages, int *space_available, process_t *
                 }
             }
             //printf("pages remaining: %d\n", pages_remaining);
-            swap_pages_v(pages, num_pages, space_available, process, pages_remaining, process_queue, simulation_time_elapsed, loading_cost);
+            swap_pages_cm(pages, num_pages, space_available, process, pages_remaining, process_queue,
+                    simulation_time_elapsed, loading_cost, pages_time);
         }
     }
     return 1;
 }
 
-void load_pages_cm(int *pages, int num_pages, int *space_available, process_t *process, int pages_remaining, int *loading_cost){
+void load_pages_cm(int *pages, int num_pages, int *space_available, process_t *process, int pages_remaining, int *loading_cost, int *pages_time){
 
     for (int i = 0; i < num_pages; i++) {
         if(pages[i] == -1) {
@@ -97,6 +98,11 @@ void load_pages_cm(int *pages, int num_pages, int *space_available, process_t *p
             pages_remaining--;
             *space_available = *space_available-1;
             *loading_cost = *loading_cost + 2;
+
+            /**
+             * TIME
+             */
+            pages_time[i] = 0;
             if(pages_remaining == 0){
                 break;
             }
@@ -111,7 +117,7 @@ void load_pages_cm(int *pages, int num_pages, int *space_available, process_t *p
 }
 
 void swap_pages_cm(int *pages, int num_pages, int *space_available, process_t *process, int pages_remaining,
-                  deque_t *process_queue, int simulation_time_elapsed, int *loading_cost){
+                  deque_t *process_queue, int simulation_time_elapsed, int *loading_cost, int *pages_time){
 
     //printf("Swapping pages\n");
     //printf("Pages remaining: %d\n", pages_remaining);
@@ -120,32 +126,29 @@ void swap_pages_cm(int *pages, int num_pages, int *space_available, process_t *p
     int mem_addresses_len = 0;
 
     process_t *least_recent_process = new_process();
-    node_t *curr = process_queue->foot;
     /**
      * While there is not enough space to store either minimum pages or all pages if page req is < 4
      */
     while(pages_remaining > *space_available) {
         /**
-         * Determine the least recent process and discard its pages from memory ONE BY ONE
+         * Determine the OLDEST process/pages belong to process and discard its pages from memory ONE BY ONE
          */
-        while (curr != NULL) {
-            //printf("curr process: Process %d\n", curr->data.process->pid);
-            if (curr->data.process->time_started != -1 && curr->data.process->occupying_memory != -1) {
-                least_recent_process = curr->data.process;
-                //printf("least recent process: Process %d\n", least_recent_process->pid);
-                break;
-            }
-            else { // if the process at the front of the queue has not yet been executed, there is no memory to replace, or its already been discarded
-                curr = curr->prev;
-            }
-        }
-        // discard its pages from memory
-        //print_evicted(pages, num_pages, least_recent_process, simulation_time_elapsed);
+        int pid = determine_oldest_process(pages, pages_time, num_pages);
 
         /**
-         * CAREFUL ABOUT SETTING OCCUPYING MEMORY TO FALSE as some pages may still exist in memory
+         * Retrieve this process from the queue to pass to discard
          */
-        discard_pages_v(pages, num_pages, space_available, least_recent_process, simulation_time_elapsed, pages_remaining, mem_addresses, &mem_addresses_len);
+        process_t *oldest_process = new_process();
+        node_t *curr = process_queue->foot;
+        while(curr != NULL){
+            if(curr->data.process->pid == pid){
+                oldest_process = curr->data.process;
+            }
+            curr = curr->prev;
+        }
+
+        // discard its pages from memory
+        discard_pages_cm(pages, num_pages, space_available, oldest_process, simulation_time_elapsed, pages_remaining, mem_addresses, &mem_addresses_len, pages_time);
     }
     //printf("Flushed memory\n");
     print_memory(pages, num_pages);
@@ -156,14 +159,14 @@ void swap_pages_cm(int *pages, int num_pages, int *space_available, process_t *p
      * Once there is enough space available to store all process' pages, load them
      */
     //printf("Enough space, load pages\n");
-    load_pages_v(pages, num_pages, space_available, process, pages_remaining, loading_cost);
+    load_pages_cm(pages, num_pages, space_available, process, pages_remaining, loading_cost, pages_time);
 
     insertion_sort_evicted(mem_addresses, mem_addresses_len);
     print_evicted(process, simulation_time_elapsed, mem_addresses, mem_addresses_len);
 }
 
 void discard_pages_cm(int *pages, int num_pages, int *space_available, process_t *process,
-        int simulation_time_elapsed, int pages_remaining, int *mem_addresses, int *mem_addresses_len){
+        int simulation_time_elapsed, int pages_remaining, int *mem_addresses, int *mem_addresses_len, int *pages_time){
     /**
      * DISCARD until space_available == pages_remaining
      * will also print the evicted output
@@ -185,6 +188,11 @@ void discard_pages_cm(int *pages, int num_pages, int *space_available, process_t
                 pages[i] = -1;
                 removed_count++;
                 *space_available = *space_available + 1;
+
+                /**
+                 * TIME
+                 */
+                pages_time[i] = -1;
 
                 // add it to evicted memory address
                 mem_addresses[*mem_addresses_len] = i;
@@ -208,22 +216,33 @@ void discard_pages_cm(int *pages, int num_pages, int *space_available, process_t
     if(count == removed_count) {
         process->occupying_memory = -1;
     }
-
-    /**
-     * Print Evicted
-     */
-
-    //print_evicted(process, simulation_time_elapsed, mem_addresses, index);
 }
 
-/*int count_process_mem(const int *pages, int num_pages, process_t *process) {
+void initialize_time(int *pages_time, int num_pages){
 
-    int count = 0;
     for(int i = 0; i < num_pages; i++){
+        pages_time[i] = -1;
+        //printf("Page %d: %d\n", i, pages[i]);
+    }
+}
 
-        // if contains the id we are looking for, update count
-        if(pages[i] == process->pid){
-            count++;
+void update_pages_time(int *pages_time, int num_pages){
+    for(int i = 0; i < num_pages; i++){
+        if(pages_time[i] != -1) {
+            pages_time[i] = pages_time[i]+1;
+            //printf("Page %d: %d\n", i, pages[i]);
         }
     }
-    return count;*/
+}
+
+int determine_oldest_process(int *pages, int *pages_time, int num_pages){
+    int max_age = 0;
+    int max_age_index = 0;
+    for(int i = 0; i < num_pages; i++){
+        if(pages_time[i] > max_age) {
+            max_age = pages_time[i];
+            max_age_index = i;
+        }
+    }
+    return pages[max_age_index];
+}
