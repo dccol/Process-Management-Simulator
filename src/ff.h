@@ -10,6 +10,8 @@
 #include "process.h"
 #include "sort.h"
 #include "memory_p.h"
+#include "memory_v.h"
+#include "memory_cm.h"
 #include "round.h"
 #include "statistics.h"
 #include "print_output.h"
@@ -44,7 +46,7 @@ int run_process_ff(process_t *process);
  * @return
  */
 void step_ff(deque_t *process_queue, process_t *current_process, int *simulation_time_elapsed, int *pages,
-        int num_pages, int *space_available, int *state, int *loading_cost, char *memory_opt);
+        int num_pages, int *space_available, int *state, int *loading_cost, char *memory_opt, int *pages_time);
 
 /**
  * Takes processes from pending queue and adds them to the process queue to simulate the arrival of a new process

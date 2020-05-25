@@ -25,6 +25,8 @@ void fc_fs(deque_t *pending_process_queue, deque_t *process_queue, char *memory_
     int *pages = NULL;
     int space_available = -1;
 
+    int *pages_time = NULL;
+
     // STATISTICS VARIABLES
     int interval_throughput = 0;
     double throughput_av = 0;
@@ -52,6 +54,15 @@ void fc_fs(deque_t *pending_process_queue, deque_t *process_queue, char *memory_
 
         initialize_empty_pages(pages, num_pages);
         //print_memory(pages, num_pages);
+
+        /**
+         * If the Memory option is cm, initialize the time data structure to keep track of how long a page has been in memory
+         */
+        if(strstr(memory_opt, "cm")){
+
+            pages_time = (int*)malloc(sizeof(*pages) * num_pages);
+            initialize_time(pages_time, num_pages);
+        }
     }
 
     /**
@@ -77,7 +88,7 @@ void fc_fs(deque_t *pending_process_queue, deque_t *process_queue, char *memory_
             process_t *place_holder_process = new_process();
 
             step_ff(process_queue, place_holder_process, &simulation_time_elapsed, pages, num_pages,
-                    &space_available, &state, &loading_cost, memory_opt);
+                    &space_available, &state, &loading_cost, memory_opt, pages_time);
 
             /**
              * If interval is over calculate the throughput values
@@ -147,7 +158,7 @@ void fc_fs(deque_t *pending_process_queue, deque_t *process_queue, char *memory_
                  */
                 check_pending(pending_process_queue, process_queue, simulation_time_elapsed);
                 step_ff(process_queue, process, &simulation_time_elapsed, pages, num_pages,
-                        &space_available, &state, &loading_cost, memory_opt);
+                        &space_available, &state, &loading_cost, memory_opt, pages_time);
 
                 /**
                  * If the Process is finished
@@ -162,7 +173,7 @@ void fc_fs(deque_t *pending_process_queue, deque_t *process_queue, char *memory_
 
                         //print_evicted(pages, num_pages, process, simulation_time_elapsed);
 
-                        discard_pages(pages, num_pages, &space_available, process, simulation_time_elapsed);
+                        discard_pages(pages, num_pages, &space_available, process, simulation_time_elapsed, pages_time);
                     }
                     printf("%d, FINISHED, id=%d, proc-remaining=%d\n", simulation_time_elapsed,
                            process->pid, process_queue->size);
@@ -238,7 +249,7 @@ void fc_fs(deque_t *pending_process_queue, deque_t *process_queue, char *memory_
  * abstraction of a unit of time (second)
  */
 void step_ff(deque_t *process_queue, process_t *current_process, int *simulation_time_elapsed, int *pages,
-        int num_pages, int *space_available, int* state, int *loading_cost, char *memory_opt){
+        int num_pages, int *space_available, int* state, int *loading_cost, char *memory_opt, int *pages_time){
 
     /**
      * IF LOADING => LOAD PROCESS PAGES INTO MEMORY
@@ -253,7 +264,7 @@ void step_ff(deque_t *process_queue, process_t *current_process, int *simulation
             // how long we stay in loaded is based on 2*num loaded pages
             if (current_process->occupying_memory == -1) {
 
-                swapping_x(pages, num_pages, space_available, current_process, process_queue, *simulation_time_elapsed);
+                swapping_x(pages, num_pages, space_available, current_process, process_queue, *simulation_time_elapsed, pages_time);
 
                 /**
                  * PRINT TO STDOUT

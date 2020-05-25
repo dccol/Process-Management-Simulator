@@ -36,7 +36,7 @@ int run_process_sf(process_t *process);
  * @return
  */
 void step_sf(deque_t *process_queue, process_t *current_process, int *simulation_time_elapsed, int *pages,
-             int num_pages, int *space_available, int *state, int *loading_cost, char *memory_opt);
+             int num_pages, int *space_available, int *state, int *loading_cost, char *memory_opt, int *pages_time);
 
 /**
  * Takes processes from pending queue and adds them to the process queue to simulate the arrival of a new process

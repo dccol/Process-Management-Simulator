@@ -26,5 +26,7 @@ void initialize_time(int *pages_time, int num_pages);
 
 void update_pages_time(int *pages_time, int num_pages);
 
-int determine_oldest_process(int *pages, int *pages_time, int num_pages);
+int determine_oldest_process(int *pages, int *pages_time, int num_pages, process_t *process);
+
+void print_memory_cm(int *pages, int num_pages, int *pages_time);
 #endif

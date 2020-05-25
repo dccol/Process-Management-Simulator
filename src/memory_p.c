@@ -1,7 +1,7 @@
 
 #include "memory_p.h"
 
-void swapping_x(int *pages, int num_pages, int *space_available, process_t *process, deque_t *process_queue, int simulation_time_elapsed){
+void swapping_x(int *pages, int num_pages, int *space_available, process_t *process, deque_t *process_queue, int simulation_time_elapsed, int *pages_time){
 
     // Pages remaining to load
     int process_pages_req = process->mem_req / PAGE_SIZE;
@@ -15,7 +15,7 @@ void swapping_x(int *pages, int num_pages, int *space_available, process_t *proc
         load_pages(pages, num_pages, space_available, process, process_pages_req, process_queue);
     }
     else{
-        swap_pages(pages, num_pages, space_available, process, process_pages_req, process_queue, simulation_time_elapsed);
+        swap_pages(pages, num_pages, space_available, process, process_pages_req, process_queue, simulation_time_elapsed, pages_time);
     }
 
 }
@@ -48,7 +48,7 @@ void load_pages(int *pages, int num_pages, int *space_available, process_t *proc
 
 }
 
-void swap_pages(int *pages, int num_pages, int *space_available, process_t *process, int pages_remaining, deque_t *process_queue, int simulation_time_elapsed){
+void swap_pages(int *pages, int num_pages, int *space_available, process_t *process, int pages_remaining, deque_t *process_queue, int simulation_time_elapsed, int *pages_time){
 
     //printf("Swapping pages\n");
     //printf("Pages remaining: %d\n", pages_remaining);
@@ -75,7 +75,7 @@ void swap_pages(int *pages, int num_pages, int *space_available, process_t *proc
         }
         // discard its pages from memory
         //print_evicted(pages, num_pages, least_recent_process, simulation_time_elapsed);
-        discard_pages(pages, num_pages, space_available, least_recent_process, simulation_time_elapsed);
+        discard_pages(pages, num_pages, space_available, least_recent_process, simulation_time_elapsed, pages_time);
     }
     //printf("Flushed memory\n");
     //print_memory(pages, num_pages);
@@ -88,7 +88,7 @@ void swap_pages(int *pages, int num_pages, int *space_available, process_t *proc
     load_pages(pages, num_pages, space_available, process, pages_remaining, process_queue);
 }
 
-void discard_pages(int *pages, int num_pages, int *space_available, process_t *process, int simulation_time_elapsed){
+void discard_pages(int *pages, int num_pages, int *space_available, process_t *process, int simulation_time_elapsed, int *pages_time){
     /**
      * DISCARD
      */
@@ -101,6 +101,11 @@ void discard_pages(int *pages, int num_pages, int *space_available, process_t *p
         if(pages[i] == process->pid){
             pages[i] = -1;
             *space_available = *space_available+1;
+
+            // if using cm update time structure
+            if(pages_time != NULL){
+                pages_time[i] = -1;
+            }
 
             // add it to evicted memory address
             mem_addresses[index] = i;

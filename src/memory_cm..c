@@ -112,7 +112,7 @@ void load_pages_cm(int *pages, int num_pages, int *space_available, process_t *p
      * Set occupying memory to true
      */
     process->occupying_memory = 1;
-    print_memory(pages, num_pages);
+    print_memory_cm(pages, num_pages, pages_time);
     //printf("space_available after load: %d\n", *space_available);
 }
 
@@ -131,8 +131,11 @@ void swap_pages_cm(int *pages, int num_pages, int *space_available, process_t *p
     while(pages_remaining > *space_available) {
         /**
          * Determine the OLDEST process/pages belong to process and discard its pages from memory ONE BY ONE
+         * NOT INCLUDING CURRENT PROCESS
          */
-        int pid = determine_oldest_process(pages, pages_time, num_pages);
+        print_memory_cm(pages, num_pages, pages_time);
+        int pid = determine_oldest_process(pages, pages_time, num_pages, process);
+        fprintf(stderr, "Oldest Process: %d\n", pid);
 
         /**
          * Retrieve this process from the queue to pass to discard
@@ -150,7 +153,7 @@ void swap_pages_cm(int *pages, int num_pages, int *space_available, process_t *p
         discard_pages_cm(pages, num_pages, space_available, oldest_process, simulation_time_elapsed, pages_remaining, mem_addresses, &mem_addresses_len, pages_time);
     }
     //printf("Flushed memory\n");
-    print_memory(pages, num_pages);
+    print_memory_cm(pages, num_pages, pages_time);
     //printf("space_available after discard: %d\n", *space_available);
     fprintf(stderr, "\n");
 
@@ -234,14 +237,57 @@ void update_pages_time(int *pages_time, int num_pages){
     }
 }
 
-int determine_oldest_process(int *pages, int *pages_time, int num_pages){
+int determine_oldest_process(int *pages, int *pages_time, int num_pages, process_t *process){
     int max_age = 0;
     int max_age_index = 0;
     for(int i = 0; i < num_pages; i++){
-        if(pages_time[i] > max_age) {
+        if(pages_time[i] > max_age && pages[i] != process->pid) {
             max_age = pages_time[i];
             max_age_index = i;
         }
     }
     return pages[max_age_index];
+}
+
+void print_memory_cm(int *pages, int num_pages, int *pages_time){
+    for(int i = 0; i < num_pages; i++){
+        fprintf(stderr, "Page %2d: %2d\tAge: %d\n", i, pages[i], pages_time[i]);
+    }
+}
+
+void flush_pages(int *pages, int num_pages, int *space_available, process_t *process, int simulation_time_elapsed, int *pages_time){
+    /**
+     * DISCARD
+     */
+
+    int *mem_addresses = (int *) malloc(sizeof(*mem_addresses) * (process->mem_req / PAGE_SIZE));
+    int index = 0;
+
+    // remove all process pages from memory
+    for(int i = 0; i < num_pages; i++){
+        if(pages[i] == process->pid){
+            pages[i] = -1;
+            *space_available = *space_available+1;
+
+            /**
+             * TIME
+             */
+            pages_time[i] = -1;
+
+            // add it to evicted memory address
+            mem_addresses[index] = i;
+            //printf("MEMIndex %d\n", index);
+            index++;
+            //printf("Evicted page %d\n", i);
+        }
+    }
+    /**
+     * Set occupying memory to false
+     */
+    process->occupying_memory = -1;
+
+    /**
+     * Print Evicted
+     */
+    print_evicted(process, simulation_time_elapsed, mem_addresses, index);
 }
