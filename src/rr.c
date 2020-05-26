@@ -250,6 +250,7 @@ void rr(deque_t *pending_process_queue, deque_t *process_queue, char *memory_opt
                      * KEEP TRACK OF HOW MANY PROCESSES HAVE FINISHED IN THE INTERVAL
                      */
                     interval_throughput++;
+                    fprintf(stderr, "Interval thruput: %d\n", interval_throughput);
 
                     /**
                      * KEEP TRACK OF HOW MANY PROCESSES HAVE FINISHED TOTAL
@@ -281,6 +282,9 @@ void rr(deque_t *pending_process_queue, deque_t *process_queue, char *memory_opt
             }
         }
     }
+    printf("calulating final thruput\n");
+
+    calculate_throughput(simulation_time_elapsed, &throughput_av, &throughput_min, &throughput_max, interval_throughput);
     /**
      * PRINT STATISTICS
      */

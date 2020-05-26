@@ -6,6 +6,7 @@
 #include <stdlib.h>
 
 #include "process.h"
+#include "round.h"
 
 void calculate_throughput(int simulation_time_elapsed, double *throughput_av, int *throughput_min, int *throughput_max, int interval_throughput);
 
