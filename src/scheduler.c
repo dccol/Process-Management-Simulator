@@ -20,7 +20,7 @@
  * @param processes_file
  * @param pending_process_queue
  */
-//
+
 void initialize_queue(FILE *processes_file, deque_t *pending_process_queue);
 
 int main(int argc, char **argv) {
@@ -68,20 +68,6 @@ int main(int argc, char **argv) {
             default:
                 printf("Incorrect option");
                 return 1;
-        }
-    }
-
-    if(DEBUG == 1) {
-        printf("here");
-        node_t *curr = pending_process_queue->foot;
-        while (curr != NULL) {
-            printf("Process ID: %d\n", curr->data.process->pid);
-            printf("Time Received: %d\n", curr->data.process->time_rec);
-            printf("Memory Requirement: %d\n", curr->data.process->mem_req);
-            printf("Time Remaining: %d\n", curr->data.process->time_remaining);
-            printf("\n");
-
-            curr = curr->prev;
         }
     }
 

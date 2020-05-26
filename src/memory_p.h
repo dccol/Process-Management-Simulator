@@ -24,5 +24,5 @@ void discard_pages(int *pages, int num_pages, int *space_available, process_t *l
 
 void print_memory(int *pages, int num_pages);
 
-void find_process_mem(int *pages, int num_pages, process_t *process, int *mem_addresses);
+void find_process_mem(const int *pages, int num_pages, process_t *process, int *mem_addresses);
 #endif

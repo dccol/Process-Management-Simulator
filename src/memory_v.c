@@ -144,7 +144,7 @@ void swap_pages_v(int *pages, int num_pages, int *space_available, process_t *pr
         /**
          * CAREFUL ABOUT SETTING OCCUPYING MEMORY TO FALSE as some pages may still exist in memory
          */
-        discard_pages_v(pages, num_pages, space_available, least_recent_process, simulation_time_elapsed, pages_remaining, mem_addresses, &mem_addresses_len);
+        discard_pages_v(pages, num_pages, space_available, least_recent_process, pages_remaining, mem_addresses, &mem_addresses_len);
     }
     //printf("Flushed memory\n");
     print_memory(pages, num_pages);
@@ -161,7 +161,7 @@ void swap_pages_v(int *pages, int num_pages, int *space_available, process_t *pr
     print_evicted(simulation_time_elapsed, mem_addresses, mem_addresses_len);
 }
 
-void discard_pages_v(int *pages, int num_pages, int *space_available, process_t *process, int simulation_time_elapsed, int pages_remaining, int *mem_addresses, int *mem_addresses_len){
+void discard_pages_v(int *pages, int num_pages, int *space_available, process_t *process, int pages_remaining, int *mem_addresses, int *mem_addresses_len){
     /**
      * DISCARD until space_available == pages_remaining
      * will also print the evicted output
@@ -225,4 +225,4 @@ int count_process_mem(const int *pages, int num_pages, process_t *process) {
         }
     }
     return count;
-}//
+}

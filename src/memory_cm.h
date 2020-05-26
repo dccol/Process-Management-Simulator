@@ -20,13 +20,13 @@ void swap_pages_cm(int *pages, int num_pages, int *space_available, process_t *p
                    deque_t *process_queue, int simulation_time_elapsed, int *loading_cost, int *pages_time);
 
 void discard_pages_cm(int *pages, int num_pages, int *space_available, process_t *process,
-        int simulation_time_elapsed, int pages_remaining, int *mem_addresses, int *mem_addresses_len, int *pages_time);
+        int pages_remaining, int *mem_addresses, int *mem_addresses_len, int *pages_time);
 
 void initialize_time(int *pages_time, int num_pages);
 
 void update_pages_time(int *pages_time, int num_pages);
 
-int determine_oldest_process(int *pages, int *pages_time, int num_pages, process_t *process);
+int determine_oldest_process(int *pages, const int *pages_time, int num_pages, process_t *process);
 
 void print_memory_cm(int *pages, int num_pages, int *pages_time);
 #endif

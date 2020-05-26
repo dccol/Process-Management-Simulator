@@ -150,7 +150,7 @@ void swap_pages_cm(int *pages, int num_pages, int *space_available, process_t *p
         }
 
         // discard its pages from memory
-        discard_pages_cm(pages, num_pages, space_available, oldest_process, simulation_time_elapsed, pages_remaining, mem_addresses, &mem_addresses_len, pages_time);
+        discard_pages_cm(pages, num_pages, space_available, oldest_process, pages_remaining, mem_addresses, &mem_addresses_len, pages_time);
     }
     //printf("Flushed memory\n");
     print_memory_cm(pages, num_pages, pages_time);
@@ -167,8 +167,7 @@ void swap_pages_cm(int *pages, int num_pages, int *space_available, process_t *p
     print_evicted(simulation_time_elapsed, mem_addresses, mem_addresses_len);
 }
 
-void discard_pages_cm(int *pages, int num_pages, int *space_available, process_t *process,
-        int simulation_time_elapsed, int pages_remaining, int *mem_addresses, int *mem_addresses_len, int *pages_time){
+void discard_pages_cm(int *pages, int num_pages, int *space_available, process_t *process, int pages_remaining, int *mem_addresses, int *mem_addresses_len, int *pages_time){
     /**
      * DISCARD until space_available == pages_remaining
      * will also print the evicted output
@@ -237,7 +236,7 @@ void update_pages_time(int *pages_time, int num_pages){
     }
 }
 
-int determine_oldest_process(int *pages, int *pages_time, int num_pages, process_t *process){
+int determine_oldest_process(int *pages, const int *pages_time, int num_pages, process_t *process){
     int max_age = 0;
     int max_age_index = 0;
     for(int i = 0; i < num_pages; i++){
@@ -254,5 +253,3 @@ void print_memory_cm(int *pages, int num_pages, int *pages_time){
         fprintf(stderr, "Page %2d: %2d\tAge: %d\n", i, pages[i], pages_time[i]);
     }
 }
-
-//

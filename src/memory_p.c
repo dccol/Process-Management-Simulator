@@ -130,7 +130,7 @@ void print_memory(int *pages, int num_pages){
         fprintf(stderr, "Page %2d: %2d\n", i, pages[i]);
     }
 }
-void find_process_mem(int *pages, int num_pages, process_t *process, int *mem_addresses) {
+void find_process_mem(const int *pages, int num_pages, process_t *process, int *mem_addresses) {
 
     int index = 0;
     for(int i = 0; i < num_pages; i++){
@@ -143,6 +143,3 @@ void find_process_mem(int *pages, int num_pages, process_t *process, int *mem_ad
         }
     }
 }
-
-
-//

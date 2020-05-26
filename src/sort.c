@@ -4,7 +4,7 @@
 #include <stdlib.h>
 
 #include "sort.h"
-
+//
 void insertion_sort_pending(data_t *array, int n) {
 
     int i, j;
