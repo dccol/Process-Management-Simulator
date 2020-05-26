@@ -36,7 +36,8 @@ void rr(deque_t *pending_process_queue, deque_t *process_queue, char *memory_opt
  * @return
  */
 void step_rr(deque_t *process_queue, process_t *current_process, int *simulation_time_elapsed,int *pages,int num_pages,
-        int *space_available, int *state, int *loading_cost, int *quantum_rr, int *status, char *memory_opt, int *pages_time);
+        int *space_available, int *state, int *loading_cost, int *quantum_rr, int *status, char *memory_opt, int *pages_time,
+        int *loading_status);
 
 /**
  * DEcrements a processes time remaining attribute

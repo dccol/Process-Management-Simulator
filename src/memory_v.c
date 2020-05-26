@@ -16,7 +16,7 @@ int virtual_memory(int *pages, int num_pages, int *space_available, process_t *p
      *  DO NOT LOAD
      */
     if(currently_in_mem >= 4 && *space_available == 0){
-        return -1;
+        return 2;
     }
 
     if(process_pages_req <= *space_available) {
@@ -128,6 +128,7 @@ void swap_pages_v(int *pages, int num_pages, int *space_available, process_t *pr
      * Once there is enough space available to store all process' pages, load them
      */
     load_pages_v(pages, num_pages, space_available, process, pages_remaining, loading_cost);
+
     insertion_sort_evicted(mem_addresses, mem_addresses_len);
     print_evicted(simulation_time_elapsed, mem_addresses, mem_addresses_len);
 }
