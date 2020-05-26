@@ -10,6 +10,8 @@
 #include "process.h"
 #include "sort.h"
 #include "memory_p.h"
+#include "memory_v.h"
+#include "memory_cm.h"
 #include "round.h"
 #include "statistics.h"
 #include "print_output.h"

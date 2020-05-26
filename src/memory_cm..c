@@ -255,39 +255,3 @@ void print_memory_cm(int *pages, int num_pages, int *pages_time){
     }
 }
 
-void flush_pages(int *pages, int num_pages, int *space_available, process_t *process, int simulation_time_elapsed, int *pages_time){
-    /**
-     * DISCARD
-     */
-
-    int *mem_addresses = (int *) malloc(sizeof(*mem_addresses) * (process->mem_req / PAGE_SIZE));
-    int index = 0;
-
-    // remove all process pages from memory
-    for(int i = 0; i < num_pages; i++){
-        if(pages[i] == process->pid){
-            pages[i] = -1;
-            *space_available = *space_available+1;
-
-            /**
-             * TIME
-             */
-            pages_time[i] = -1;
-
-            // add it to evicted memory address
-            mem_addresses[index] = i;
-            //printf("MEMIndex %d\n", index);
-            index++;
-            //printf("Evicted page %d\n", i);
-        }
-    }
-    /**
-     * Set occupying memory to false
-     */
-    process->occupying_memory = -1;
-
-    /**
-     * Print Evicted
-     */
-    print_evicted(process, simulation_time_elapsed, mem_addresses, index);
-}
