@@ -286,7 +286,7 @@ void rr(deque_t *pending_process_queue, deque_t *process_queue, char *memory_opt
      * If simulation ends before final interval, and more processes completed in that interval, calculate final values
      */
     if(interval_throughput > 0) {
-        calculate_throughput(simulation_time_elapsed, &throughput_av, &throughput_min, &throughput_max,
+        calculate_throughput_final(simulation_time_elapsed, &throughput_av, &throughput_min, &throughput_max,
                              interval_throughput);
     }
     /**
