@@ -394,9 +394,9 @@ void step_rr(deque_t *process_queue, process_t *current_process, int *simulation
                 int process_pages_req = (current_process->mem_req / PAGE_SIZE) - currently_in_mem;
                 fprintf(stderr, "Process %d would like %d pages of memory\n", current_process->pid, process_pages_req);
 
-                printf("Memory Preload\n");
+                //printf("Memory Preload\n");
                 print_memory(pages, num_pages);
-                printf("\n");
+                //printf("\n");
 
                 // if currently not all the pages are in memory, check if we can load some more
                 if (currently_in_mem != (current_process->mem_req / PAGE_SIZE)) {
@@ -413,13 +413,13 @@ void step_rr(deque_t *process_queue, process_t *current_process, int *simulation
                     currently_in_mem = count_process_mem(pages, num_pages, current_process);
                     int pages_not_in_mem = (current_process->mem_req / PAGE_SIZE) - currently_in_mem;
                     int page_fault_cost = pages_not_in_mem;
-                    printf("%d pages not in memory, page cost added %d\n", pages_not_in_mem, page_fault_cost);
+                    //printf("%d pages not in memory, page cost added %d\n", pages_not_in_mem, page_fault_cost);
                     current_process->time_remaining = current_process->time_remaining + page_fault_cost;
                     /**
                      * Not applying page fault to processes when they have 4 pages already in memory
                      * so they dont load anymore because the pages are full
                      */
-                    printf("result %d\n", result);
+                    //printf("result %d\n", result);
                     /**
                      * A page was actually loaded
                      */
