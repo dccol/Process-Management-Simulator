@@ -15,6 +15,4 @@ void print_evicted(int simulation_time_elapsed, int *mem_addresses, int mem_addr
 
 void print_load(int *pages, int num_pages, const int *space_available, process_t *process, const int *loading_cost, const int *simulation_time_elapsed);
 
-void print_statistics();
-
 #endif

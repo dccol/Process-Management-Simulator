@@ -3,28 +3,13 @@
 
 int swapping_oldest(int *pages, int num_pages, int *space_available, process_t *process, deque_t *process_queue,
                    int simulation_time_elapsed, int process_pages_req, int *loading_cost, int *pages_time){
-
     /**
-     * WHAT IF ALL PAGES ALREADY LOADED
-     */
-    /**
-     * Requires at least 4 pages to be in memory, then page fault for the rest.
-     * Ie. add 1 to the process->time_remaining
-     * If require less then 4 pages just load them all
-     * However if there are more empty pages available, continue to fill process pages until either all loaded or no empty pages left
-     *
-     * So basically try to load al the pages, but (if space_available < process_pages,
+     * Try to load al the pages, but (if space_available < process_pages,
      *      if at least 4 empty (space_available >= 4           => fill until space_available == 0 || pages_remaining == 0),
      *      if not at least 4 empty pages (space_available < 4) => remove least recent by by page until space_available == 4;
      */
 
-    /**
-     * If enough space available load all specified pages
-     */
-
-
     int currently_in_mem = count_process_mem(pages, num_pages, process);
-
     /**
      *  If the process already meet memory requirement, and there is no space in memory to load additional pages
      *  DO NOT LOAD
@@ -37,9 +22,9 @@ int swapping_oldest(int *pages, int num_pages, int *space_available, process_t *
 
         load_pages_cm(pages, num_pages, space_available, process, process_pages_req, loading_cost, pages_time);
     }
-        /**
-         * if not enough space available
-         */
+    /**
+     * if not enough space available
+     */
     else{
 
         /**
@@ -66,7 +51,6 @@ int swapping_oldest(int *pages, int num_pages, int *space_available, process_t *
             /**
              * pass pages_remaining in to be 4 so that once 4 pages are available then it will break the discard process
              */
-
             // If the process is smaller than 4 then just free enough to fit it
             if((process->mem_req/PAGE_SIZE) < 4){
                 pages_remaining = process_pages_req;
@@ -81,7 +65,6 @@ int swapping_oldest(int *pages, int num_pages, int *space_available, process_t *
                     pages_remaining = pages_remaining - currently_in_mem;
                 }
             }
-            //printf("pages remaining: %d\n", pages_remaining);
             swap_pages_cm(pages, num_pages, space_available, process, pages_remaining, process_queue,
                     simulation_time_elapsed, loading_cost, pages_time);
         }
@@ -113,14 +96,11 @@ void load_pages_cm(int *pages, int num_pages, int *space_available, process_t *p
      */
     process->occupying_memory = 1;
     print_memory_cm(pages, num_pages, pages_time);
-    //printf("space_available after load: %d\n", *space_available);
 }
 
 void swap_pages_cm(int *pages, int num_pages, int *space_available, process_t *process, int pages_remaining,
                   deque_t *process_queue, int simulation_time_elapsed, int *loading_cost, int *pages_time){
 
-    //printf("Swapping pages\n");
-    //printf("Pages remaining: %d\n", pages_remaining);
 
     int *mem_addresses = (int *) malloc(sizeof(*mem_addresses) * (process->mem_req / PAGE_SIZE));
     int mem_addresses_len = 0;
@@ -152,15 +132,11 @@ void swap_pages_cm(int *pages, int num_pages, int *space_available, process_t *p
         // discard its pages from memory
         discard_pages_cm(pages, num_pages, space_available, oldest_process, pages_remaining, mem_addresses, &mem_addresses_len, pages_time);
     }
-    //printf("Flushed memory\n");
     print_memory_cm(pages, num_pages, pages_time);
-    //printf("space_available after discard: %d\n", *space_available);
-    fprintf(stderr, "\n");
 
     /**
      * Once there is enough space available to store all process' pages, load them
      */
-    //printf("Enough space, load pages\n");
     load_pages_cm(pages, num_pages, space_available, process, pages_remaining, loading_cost, pages_time);
 
     insertion_sort_evicted(mem_addresses, mem_addresses_len);
@@ -172,9 +148,6 @@ void discard_pages_cm(int *pages, int num_pages, int *space_available, process_t
      * DISCARD until space_available == pages_remaining
      * will also print the evicted output
      */
-
-    //printf("pages remaining: %d\n", pages_remaining);
-    //int *mem_addresses = (int *) malloc(sizeof(*mem_addresses) * (process->mem_req / PAGE_SIZE));
 
     // remove process pages from memory until space available == 4
     int count = 0;
@@ -197,9 +170,7 @@ void discard_pages_cm(int *pages, int num_pages, int *space_available, process_t
 
                 // add it to evicted memory address
                 mem_addresses[*mem_addresses_len] = i;
-                //printf("MEMIndex %d\n", index);
                 *mem_addresses_len = *mem_addresses_len + 1;
-                //printf("Evicted page %d\n", i);
 
                 /**
                  * If we not have space to load the specified number of pages, stop discarding
@@ -223,7 +194,6 @@ void initialize_time(int *pages_time, int num_pages){
 
     for(int i = 0; i < num_pages; i++){
         pages_time[i] = -1;
-        //printf("Page %d: %d\n", i, pages[i]);
     }
 }
 
@@ -231,7 +201,6 @@ void update_pages_time(int *pages_time, int num_pages){
     for(int i = 0; i < num_pages; i++){
         if(pages_time[i] != -1) {
             pages_time[i] = pages_time[i]+1;
-            //printf("Page %d: %d\n", i, pages[i]);
         }
     }
 }

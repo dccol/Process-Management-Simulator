@@ -10,8 +10,6 @@
 #include "rr.h"
 #include "sf.h"
 
-#define DEBUG 0
-
 #define MAX_CHAR 1000
 
 /**

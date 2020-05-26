@@ -309,7 +309,6 @@ void step_sf(deque_t *process_queue, process_t *current_process, int *simulation
                 int result = virtual_memory(pages, num_pages, space_available, current_process, process_queue,
                                             *simulation_time_elapsed, process_pages_req, loading_cost);
 
-                printf("result %d\n", result);
                 if (result == 1) {
                     /**
                      * Once loading has occurred, apply page fault cost
@@ -328,9 +327,9 @@ void step_sf(deque_t *process_queue, process_t *current_process, int *simulation
                 }
 
             }
-                /**
-                    * If no loading occurred check if should change state
-                    */
+            /**
+            * If no loading occurred check if should change state
+            */
             else {
                 if (*loading_cost == 1) {
                     *state = RUNNING;
@@ -359,6 +358,7 @@ void step_sf(deque_t *process_queue, process_t *current_process, int *simulation
              * If pages is less than 4 and not all the process pages are currently in memory
              */
             int currently_in_mem = count_process_mem(pages, num_pages, current_process);
+
             // Pass in total pages NOT already in memory
             int process_pages_req = (current_process->mem_req/PAGE_SIZE) - currently_in_mem;
             fprintf(stderr,"Process %d would like %d pages of memory\n", current_process->pid, process_pages_req);
@@ -369,12 +369,6 @@ void step_sf(deque_t *process_queue, process_t *current_process, int *simulation
                 /**
                  * LOAD
                  */
-                // Pass in total pages NOT already in memory
-                //int process_pages_req = (current_process->mem_req/PAGE_SIZE) - currently_in_mem;
-                //fprintf(stderr,"Process %d would like %d pages of memory\n", current_process->pid, process_pages_req);
-
-                // Loading cost will be derived by how many pages were loaded
-
                 int result = swapping_oldest(pages, num_pages, space_available, current_process, process_queue,
                                              *simulation_time_elapsed, process_pages_req, loading_cost, pages_time);
 
@@ -450,23 +444,14 @@ void step_sf(deque_t *process_queue, process_t *current_process, int *simulation
          */
     else if(*state == RUNNING) {
 
-        //printf("Process %d beginning at time %d\n", current_process->pid, current_process->time_started);
+
         fprintf(stderr, "%d, RUNNING, id=%d, remaining-time=%d\n", *simulation_time_elapsed, current_process->pid, current_process->time_remaining);
         int status = run_process_sf(current_process);
-
-        //printf("%3d, RUNNING, id: %d, remaining-time: %d\n", *simulation_time_elapsed, current_process->pid, current_process->time_remaining);
-        /**
-         * If the process is done
-         */
-        if (status == DONE) {
-            /*printf("%3d, FINISHED, id: %d, remaining-time %d, proc-remaining: %d\n", *simulation_time_elapsed,
-                    current_process->pid, current_process->time_remaining, process_queue->size);*/
-        }
     }
 
-        /**
-         * If WAITING => DO NOTHING, but check incoming process' and tick time
-         */
+    /**
+     * If WAITING => DO NOTHING, but check incoming process' and tick time
+     */
     else if(*state == WAITING){
         fprintf(stderr, "%d, WAITING\n", *simulation_time_elapsed);
     }
@@ -498,8 +483,7 @@ void check_pending_sf(deque_t *pending_process_queue, deque_t *process_queue, in
 
     if(pending_process_queue->head != NULL) {
 
-        // dynamically add memory in future , realloc?
-        data_t *processes_to_insert = (data_t*)malloc(sizeof(*processes_to_insert) * 10);
+        data_t *processes_to_insert = (data_t*)malloc(sizeof(*processes_to_insert) * pending_process_queue->size);
         process_t *next_process_to_arrive = pending_process_queue->foot->data.process;
 
         int index = 0;

@@ -386,12 +386,6 @@ void step_rr(deque_t *process_queue, process_t *current_process, int *simulation
                 /**
                  * LOAD
                  */
-                // Pass in total pages NOT already in memory
-                //int process_pages_req = (current_process->mem_req/PAGE_SIZE) - currently_in_mem;
-                //fprintf(stderr,"Process %d would like %d pages of memory\n", current_process->pid, process_pages_req);
-
-                // Loading cost will be derived by how many pages were loaded
-
                 int result = virtual_memory(pages, num_pages, space_available, current_process, process_queue,
                         *simulation_time_elapsed, process_pages_req, loading_cost);
 
@@ -476,12 +470,6 @@ void step_rr(deque_t *process_queue, process_t *current_process, int *simulation
                 /**
                  * LOAD
                  */
-                // Pass in total pages NOT already in memory
-                //int process_pages_req = (current_process->mem_req/PAGE_SIZE) - currently_in_mem;
-                //fprintf(stderr,"Process %d would like %d pages of memory\n", current_process->pid, process_pages_req);
-
-                // Loading cost will be derived by how many pages were loaded
-
                 int result = swapping_oldest(pages, num_pages, space_available, current_process, process_queue,
                                             *simulation_time_elapsed, process_pages_req, loading_cost, pages_time);
 
@@ -558,7 +546,6 @@ void step_rr(deque_t *process_queue, process_t *current_process, int *simulation
      */
     else if(*state == RUNNING) {
 
-        //printf("Process %d beginning at time %d\n", current_process->pid, current_process->time_started);
         fprintf(stderr, "%d, RUNNING, id=%d, remaining-time=%d, quantum=%d\n", *simulation_time_elapsed, current_process->pid,
                 current_process->time_remaining, *quantum_rr);
 
@@ -609,8 +596,8 @@ int run_process_rr(process_t *process, int *quantum_rr){
 void check_pending_rr(deque_t *pending_process_queue, deque_t *process_queue, int simulation_time){
 
     if(pending_process_queue->head != NULL) {
-        // dynamically add memory in future
-        data_t processes_to_insert[10];
+
+        data_t *processes_to_insert = (data_t*)malloc(sizeof(*processes_to_insert) * pending_process_queue->size);
         process_t *next_process_to_arrive = pending_process_queue->foot->data.process;
 
         int index = 0;

@@ -23,7 +23,6 @@ void swapping_x(int *pages, int num_pages, int *space_available, process_t *proc
 void initialize_empty_pages(int *pages, int num_pages){
     for(int i = 0; i < num_pages; i++){
         pages[i] = -1;
-        //printf("Page %d: %d\n", i, pages[i]);
     }
 }
 
@@ -44,14 +43,9 @@ void load_pages(int *pages, int num_pages, int *space_available, process_t *proc
      * Set occupying memory to true
      */
     process->occupying_memory = 1;
-    //print_memory(pages, num_pages);
-
 }
 
 void swap_pages(int *pages, int num_pages, int *space_available, process_t *process, int pages_remaining, deque_t *process_queue, int simulation_time_elapsed, int *pages_time){
-
-    //printf("Swapping pages\n");
-    //printf("Pages remaining: %d\n", pages_remaining);
 
     process_t *least_recent_process = new_process();
     node_t *curr = process_queue->foot;
@@ -63,28 +57,22 @@ void swap_pages(int *pages, int num_pages, int *space_available, process_t *proc
          * Determine the least recent process and discard its pages from memory
          */
         while (curr != NULL) {
-            //printf("curr process: Process %d\n", curr->data.process->pid);
+
             if (curr->data.process->time_started != -1 && curr->data.process->occupying_memory != -1) {
                 least_recent_process = curr->data.process;
-                //printf("least recent process: Process %d\n", least_recent_process->pid);
                 break;
             }
-            else { // if the process at the front of the queue has not yet been executed, there is no memory to replace
+            else {
                 curr = curr->prev;
             }
         }
         // discard its pages from memory
-        //print_evicted(pages, num_pages, least_recent_process, simulation_time_elapsed);
         discard_pages(pages, num_pages, space_available, least_recent_process, simulation_time_elapsed, pages_time);
     }
-    //printf("Flushed memory\n");
-    //print_memory(pages, num_pages);
-    //printf("\n");
 
     /**
      * Once there is enough space available to store all process' pages, load them
      */
-    //printf("Enough spcace, load pages\n");
     load_pages(pages, num_pages, space_available, process, pages_remaining);
 }
 
@@ -109,9 +97,7 @@ void discard_pages(int *pages, int num_pages, int *space_available, process_t *p
 
             // add it to evicted memory address
             mem_addresses[index] = i;
-            //printf("MEMIndex %d\n", index);
             index++;
-            //printf("Evicted page %d\n", i);
         }
     }
     /**

@@ -36,7 +36,3 @@ void print_load(int *pages, int num_pages, const int *space_available, process_t
     printf("%d]\n", mem_addresses[currently_in_mem-1]);
     free(mem_addresses);
 }
-
-void print_statistics(){
-
-}

@@ -49,9 +49,7 @@ void fc_fs(deque_t *pending_process_queue, deque_t *process_queue, char *memory_
 
         // initialize RAM pages
         pages = (int*)malloc(sizeof(*pages) * num_pages);
-
         space_available = num_pages;
-
         initialize_empty_pages(pages, num_pages);
         //print_memory(pages, num_pages);
 
@@ -94,7 +92,6 @@ void fc_fs(deque_t *pending_process_queue, deque_t *process_queue, char *memory_
              * If interval is over calculate the throughput values
              */
             if((simulation_time_elapsed % 60) == 0){
-
                 calculate_throughput(simulation_time_elapsed, &throughput_av, &throughput_min, &throughput_max, interval_throughput);
 
                 // RESET THROUGHPUT_INTERVAL
@@ -132,16 +129,13 @@ void fc_fs(deque_t *pending_process_queue, deque_t *process_queue, char *memory_
              * If the memory option is virtual memoy
              */
             else if (strstr(memory_opt, "v")) {
-
                 state = LOADING;
-
                 loading_cost = 0;
             }
             /**
              * If memory option is cm
              */
             else if (strstr(memory_opt, "cm")){
-
                 state = LOADING;
                 loading_cost = 0;
             }
@@ -274,9 +268,7 @@ void step_ff(deque_t *process_queue, process_t *current_process, int *simulation
         if (strstr(memory_opt, "p")) {
             // how long we stay in loaded is based on 2*num loaded pages
             if (current_process->occupying_memory == -1) {
-
                 swapping_x(pages, num_pages, space_available, current_process, process_queue, *simulation_time_elapsed, pages_time);
-
                 /**
                  * PRINT TO STDOUT
                  */
@@ -292,7 +284,6 @@ void step_ff(deque_t *process_queue, process_t *current_process, int *simulation
                     *state = RUNNING;
                 }
             }
-
             *loading_cost = *loading_cost - 1;
         }
         /**
@@ -307,14 +298,12 @@ void step_ff(deque_t *process_queue, process_t *current_process, int *simulation
 
             // if currently not all the pages are in memory, check if we can load some more
             if(currently_in_mem != (current_process->mem_req/PAGE_SIZE) ) {
-
                 /**
                  * LOAD
                  */
                 int result = virtual_memory(pages, num_pages, space_available, current_process, process_queue,
                                             *simulation_time_elapsed, process_pages_req, loading_cost);
 
-                printf("result %d\n", result);
                 if (result == 1) {
                     /**
                      * Once loading has occurred, apply page fault cost
@@ -323,8 +312,6 @@ void step_ff(deque_t *process_queue, process_t *current_process, int *simulation
                     int pages_not_in_mem = (current_process->mem_req / PAGE_SIZE) - currently_in_mem;
                     int page_fault_cost = pages_not_in_mem;
                     current_process->time_remaining = current_process->time_remaining + page_fault_cost;
-
-
                     /**
                      * PRINT TO STDOUT
                      */
@@ -334,8 +321,8 @@ void step_ff(deque_t *process_queue, process_t *current_process, int *simulation
 
             }
             /**
-                * If no loading occurred check if should change state
-                */
+            * If no loading occurred check if should change state
+            */
             else {
                 if (*loading_cost == 1) {
                     *state = RUNNING;
@@ -354,7 +341,6 @@ void step_ff(deque_t *process_queue, process_t *current_process, int *simulation
                     return;
                 }
             }
-
             // decrement loading time
             *loading_cost = *loading_cost - 1;
         }
@@ -370,16 +356,9 @@ void step_ff(deque_t *process_queue, process_t *current_process, int *simulation
 
             // if currently not all the pages are in memory, check if we can load some more
             if(currently_in_mem != (current_process->mem_req/PAGE_SIZE )){
-
                 /**
                  * LOAD
                  */
-                // Pass in total pages NOT already in memory
-                //int process_pages_req = (current_process->mem_req/PAGE_SIZE) - currently_in_mem;
-                //fprintf(stderr,"Process %d would like %d pages of memory\n", current_process->pid, process_pages_req);
-
-                // Loading cost will be derived by how many pages were loaded
-
                 int result = swapping_oldest(pages, num_pages, space_available, current_process, process_queue,
                                              *simulation_time_elapsed, process_pages_req, loading_cost, pages_time);
 
@@ -391,8 +370,6 @@ void step_ff(deque_t *process_queue, process_t *current_process, int *simulation
                     int pages_not_in_mem = (current_process->mem_req / PAGE_SIZE) - currently_in_mem;
                     int page_fault_cost = pages_not_in_mem;
                     current_process->time_remaining = current_process->time_remaining + page_fault_cost;
-
-
                     /**
                      * PRINT TO STDOUT
                      */
@@ -422,10 +399,9 @@ void step_ff(deque_t *process_queue, process_t *current_process, int *simulation
                 }
 
             }
-
-                /**
-                 *  if all pages are in memory, no loading occurs, check if state change
-                 */
+            /**
+             *  if all pages are in memory, no loading occurs, check if state change
+             */
             else {
                 if (*loading_cost == 1) {
                     *state = RUNNING;
@@ -444,29 +420,17 @@ void step_ff(deque_t *process_queue, process_t *current_process, int *simulation
                     return;
                 }
             }
-
             // decrement loading time
             *loading_cost = *loading_cost - 1;
         }
     }
-
     /**
      * IF RUNNING => RUN THE PROCESS
      */
     else if(*state == RUNNING) {
 
-        //printf("Process %d beginning at time %d\n", current_process->pid, current_process->time_started);
         fprintf(stderr, "%d, RUNNING, id=%d, remaining-time=%d\n", *simulation_time_elapsed, current_process->pid, current_process->time_remaining);
         int status = run_process_ff(current_process);
-
-        //printf("%3d, RUNNING, id: %d, remaining-time: %d\n", *simulation_time_elapsed, current_process->pid, current_process->time_remaining);
-        /**
-         * If the process is done
-         */
-        if (status == DONE) {
-            /*printf("%3d, FINISHED, id: %d, remaining-time %d, proc-remaining: %d\n", *simulation_time_elapsed,
-                    current_process->pid, current_process->time_remaining, process_queue->size);*/
-        }
     }
 
     /**
@@ -475,7 +439,6 @@ void step_ff(deque_t *process_queue, process_t *current_process, int *simulation
     else if(*state == WAITING){
         fprintf(stderr, "%d, WAITING\n", *simulation_time_elapsed);
     }
-
     /**
      * TICK
      */
@@ -503,8 +466,7 @@ void check_pending(deque_t *pending_process_queue, deque_t *process_queue, int s
 
     if(pending_process_queue->head != NULL) {
 
-        // dynamically add memory in future , realloc?
-        data_t *processes_to_insert = (data_t*)malloc(sizeof(*processes_to_insert) * 10);
+        data_t *processes_to_insert = (data_t*)malloc(sizeof(*processes_to_insert) * pending_process_queue->size);
         process_t *next_process_to_arrive = pending_process_queue->foot->data.process;
 
         int index = 0;
@@ -532,10 +494,9 @@ void check_pending(deque_t *pending_process_queue, deque_t *process_queue, int s
         insertion_sort_pending(processes_to_insert, index);
 
         for (int i = 0; i < index; i++) {
-            //printf("%3d, Process ID: %d arrived\n", simulation_time, processes_to_insert[i].process->pid);
+            fprintf(stderr,"%3d, Process ID: %d arrived\n", simulation_time, processes_to_insert[i].process->pid);
             deque_insert(process_queue, processes_to_insert[i]);
         }
-        // MEMORY LEAK
         free(processes_to_insert);
     }
 }

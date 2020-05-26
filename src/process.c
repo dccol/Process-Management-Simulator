@@ -12,10 +12,6 @@ process_t *new_process() {
     assert(process!=NULL);
     process->time_started = -1;
     process->occupying_memory = -1;
-    /*process->time_rec = (int)malloc(sizeof(int));
-    process->pid = (int)malloc(sizeof(int));
-    process->mem_req = (int)malloc(sizeof(int));
-    process->time_remaining = (int)malloc(sizeof(int));*/
 
     return process;
 }
