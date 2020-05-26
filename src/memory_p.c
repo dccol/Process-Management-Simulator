@@ -12,7 +12,7 @@ void swapping_x(int *pages, int num_pages, int *space_available, process_t *proc
      */
     if(process_pages_req <= *space_available) {
         // Load the pages into memory
-        load_pages(pages, num_pages, space_available, process, process_pages_req, process_queue);
+        load_pages(pages, num_pages, space_available, process, process_pages_req);
     }
     else{
         swap_pages(pages, num_pages, space_available, process, process_pages_req, process_queue, simulation_time_elapsed, pages_time);
@@ -27,7 +27,7 @@ void initialize_empty_pages(int *pages, int num_pages){
     }
 }
 
-void load_pages(int *pages, int num_pages, int *space_available, process_t *process, int pages_remaining, deque_t *process_queue) {
+void load_pages(int *pages, int num_pages, int *space_available, process_t *process, int pages_remaining) {
 
     for (int i = 0; i < num_pages; i++) {
         if(pages[i] == -1) {
@@ -85,7 +85,7 @@ void swap_pages(int *pages, int num_pages, int *space_available, process_t *proc
      * Once there is enough space available to store all process' pages, load them
      */
     //printf("Enough spcace, load pages\n");
-    load_pages(pages, num_pages, space_available, process, pages_remaining, process_queue);
+    load_pages(pages, num_pages, space_available, process, pages_remaining);
 }
 
 void discard_pages(int *pages, int num_pages, int *space_available, process_t *process, int simulation_time_elapsed, int *pages_time){
@@ -122,7 +122,7 @@ void discard_pages(int *pages, int num_pages, int *space_available, process_t *p
     /**
      * Print Evicted
      */
-    print_evicted(process, simulation_time_elapsed, mem_addresses, index);
+    print_evicted(simulation_time_elapsed, mem_addresses, index);
 }
 
 void print_memory(int *pages, int num_pages){
@@ -145,3 +145,4 @@ void find_process_mem(int *pages, int num_pages, process_t *process, int *mem_ad
 }
 
 
+//

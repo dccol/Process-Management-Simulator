@@ -158,7 +158,7 @@ void swap_pages_v(int *pages, int num_pages, int *space_available, process_t *pr
     load_pages_v(pages, num_pages, space_available, process, pages_remaining, loading_cost);
 
     insertion_sort_evicted(mem_addresses, mem_addresses_len);
-    print_evicted(process, simulation_time_elapsed, mem_addresses, mem_addresses_len);
+    print_evicted(simulation_time_elapsed, mem_addresses, mem_addresses_len);
 }
 
 void discard_pages_v(int *pages, int num_pages, int *space_available, process_t *process, int simulation_time_elapsed, int pages_remaining, int *mem_addresses, int *mem_addresses_len){
@@ -225,4 +225,4 @@ int count_process_mem(const int *pages, int num_pages, process_t *process) {
         }
     }
     return count;
-}
+}//

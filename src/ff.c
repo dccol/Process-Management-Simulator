@@ -10,7 +10,7 @@
 #define LOADING 3
 #define RUNNING 4
 #define WAITING 5
-
+//
 
 void fc_fs(deque_t *pending_process_queue, deque_t *process_queue, char *memory_opt, int memory_size){
 

@@ -164,7 +164,7 @@ void swap_pages_cm(int *pages, int num_pages, int *space_available, process_t *p
     load_pages_cm(pages, num_pages, space_available, process, pages_remaining, loading_cost, pages_time);
 
     insertion_sort_evicted(mem_addresses, mem_addresses_len);
-    print_evicted(process, simulation_time_elapsed, mem_addresses, mem_addresses_len);
+    print_evicted(simulation_time_elapsed, mem_addresses, mem_addresses_len);
 }
 
 void discard_pages_cm(int *pages, int num_pages, int *space_available, process_t *process,
@@ -255,3 +255,4 @@ void print_memory_cm(int *pages, int num_pages, int *pages_time){
     }
 }
 
+//

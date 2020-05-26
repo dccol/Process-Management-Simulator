@@ -19,7 +19,7 @@ process_t *new_process() {
 
     return process;
 }
-
+//
 void populate_process_t(process_t *process, int i, char* data){
 
     int i_data = atoi(data);

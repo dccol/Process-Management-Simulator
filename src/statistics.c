@@ -48,4 +48,4 @@ void calculate_overhead(int simulation_time_elapsed, int turnaround_time, int jo
     double overhead_total = *overhead_av * (num_processes_finished-1);
     *overhead_av = (overhead_total + overhead)/num_processes_finished;
     fprintf(stderr,"%d, MAX-Overhead = %lf\n", simulation_time_elapsed, *overhead_av);
-}
+}//

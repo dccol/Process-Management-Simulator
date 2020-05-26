@@ -1,7 +1,7 @@
 
 #include "print_output.h"
 
-void print_evicted(process_t *process, int simulation_time_elapsed, int *mem_addresses, int mem_addresses_len){
+void print_evicted(int simulation_time_elapsed, int *mem_addresses, int mem_addresses_len){
 
     // Print
     printf("%d, EVICTED, mem-addresses=[", simulation_time_elapsed);
@@ -11,7 +11,7 @@ void print_evicted(process_t *process, int simulation_time_elapsed, int *mem_add
     printf("%d]\n", mem_addresses[mem_addresses_len - 1]);
     free(mem_addresses);
 }
-
+//
 void print_load(int *pages, int num_pages, const int *space_available, process_t *process, const int *loading_cost, const int *simulation_time_elapsed){
     double mem_usage = ((double)num_pages - (double)*space_available) / (double)num_pages * 100;
     if((mem_usage - (int)mem_usage) != 0){

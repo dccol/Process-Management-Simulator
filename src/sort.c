@@ -42,7 +42,7 @@ void insertion_sort_evicted(int *array, int n) {
 void insertion_sort_queue(deque_t *process_queue, int n) {
 
     // TAKE ALL THE PROCESSES AND STORE THEM IN AN ARRAY
-    process_t *process = process_queue->foot->data.process;
+    //process_t *process = process_queue->foot->data.process;
     data_t *array = (data_t*)malloc(sizeof(*array) * 10);
 
     int index = 0;
