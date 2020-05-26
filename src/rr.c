@@ -282,8 +282,6 @@ void rr(deque_t *pending_process_queue, deque_t *process_queue, char *memory_opt
             }
         }
     }
-    printf("calulating final thruput\n");
-
     calculate_throughput(simulation_time_elapsed, &throughput_av, &throughput_min, &throughput_max, interval_throughput);
     /**
      * PRINT STATISTICS

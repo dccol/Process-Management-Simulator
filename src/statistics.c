@@ -3,7 +3,7 @@
 #include "process.h"
 
 void calculate_throughput(int simulation_time_elapsed, double *throughput_av, int *throughput_min, int *throughput_max, int interval_throughput){
-    int interval_num = round_up(simulation_time_elapsed/60);
+    int interval_num = round_up((double)simulation_time_elapsed/(double)60);
     fprintf(stderr,"%d, Throughput of Interval %d = %d\n", simulation_time_elapsed, interval_num, interval_throughput);
     fprintf(stderr,"%d, Avg-Throughput = %lf\n", simulation_time_elapsed, *throughput_av);
     double throughput_total = *throughput_av * (interval_num-1);
