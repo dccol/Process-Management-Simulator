@@ -31,7 +31,7 @@ void rr(deque_t *pending_process_queue, deque_t *process_queue, char *memory_opt
     int *pages = NULL;
     int space_available = -1;
 
-    int *pages_time = NULL;
+    int *pages_freq = NULL;
 
     // STATISTIC VARIABLES
     int interval_throughput = 0;
@@ -66,8 +66,8 @@ void rr(deque_t *pending_process_queue, deque_t *process_queue, char *memory_opt
          */
         if(strstr(memory_opt, "cm")){
 
-            pages_time = (int*)malloc(sizeof(*pages) * num_pages);
-            initialize_time(pages_time, num_pages);
+            pages_freq= (int*)malloc(sizeof(*pages) * num_pages);
+            initialize_time(pages_freq, num_pages);
         }
     }
 
@@ -98,7 +98,7 @@ void rr(deque_t *pending_process_queue, deque_t *process_queue, char *memory_opt
 
             int quantum_rr = quantum;
             step_rr(process_queue, place_holder_process, &simulation_time_elapsed, pages, num_pages,
-                    &space_available, &state, &loading_cost, &quantum_rr, &status, memory_opt, pages_time, &loading_status);
+                    &space_available, &state, &loading_cost, &quantum_rr, &status, memory_opt, pages_freq, &loading_status);
 
             /**
              * If interval is over calculate the throughput values
@@ -208,7 +208,7 @@ void rr(deque_t *pending_process_queue, deque_t *process_queue, char *memory_opt
             while (process->time_remaining > 0 && quantum_rr > 0) {
 
                 step_rr(process_queue, process, &simulation_time_elapsed, pages, num_pages,
-                        &space_available, &state, &loading_cost, &quantum_rr, &status, memory_opt, pages_time, &loading_status);
+                        &space_available, &state, &loading_cost, &quantum_rr, &status, memory_opt, pages_freq, &loading_status);
 
                 /**
                  * If a process has been received at current simulation time, insert it into the process queue (transfer from pending queue)
@@ -237,7 +237,7 @@ void rr(deque_t *pending_process_queue, deque_t *process_queue, char *memory_opt
                      */
                     if (!strstr(memory_opt, "u")) {
 
-                        discard_pages(pages, num_pages, &space_available, process, simulation_time_elapsed, pages_time);
+                        discard_pages(pages, num_pages, &space_available, process, simulation_time_elapsed, pages_freq);
                         print_memory(pages, num_pages);
                     }
 
@@ -318,7 +318,7 @@ void rr(deque_t *pending_process_queue, deque_t *process_queue, char *memory_opt
     printf("Makespan %d\n", simulation_time_elapsed);
     //printf("All Processes Complete\n");
     free(pages);
-    free(pages_time);
+    free(pages_freq);
 }
 
 /**
@@ -326,7 +326,7 @@ void rr(deque_t *pending_process_queue, deque_t *process_queue, char *memory_opt
  */
 void step_rr(deque_t *process_queue, process_t *current_process, int *simulation_time_elapsed,int *pages,
         int num_pages, int *space_available, int *state, int *loading_cost, int *quantum_rr, int *status,
-        char *memory_opt, int *pages_time, int *loading_status){
+        char *memory_opt, int *pages_freq, int *loading_status){
 
     if(*state == LOADING) {
 
@@ -345,7 +345,7 @@ void step_rr(deque_t *process_queue, process_t *current_process, int *simulation
              */
             if (current_process->occupying_memory == -1) {
 
-                swapping_x(pages, num_pages, space_available, current_process, process_queue, *simulation_time_elapsed, pages_time);
+                swapping_x(pages, num_pages, space_available, current_process, process_queue, *simulation_time_elapsed, pages_freq);
 
                 /**
                  * PRINT TO STDOUT
@@ -524,9 +524,9 @@ void step_rr(deque_t *process_queue, process_t *current_process, int *simulation
                 int process_pages_req = (current_process->mem_req / PAGE_SIZE) - currently_in_mem;
                 fprintf(stderr, "Process %d would like %d pages of memory\n", current_process->pid, process_pages_req);
 
-                //printf("Memory Preload\n");
+                printf("Memory Preload\n");
                 print_memory(pages, num_pages);
-                //printf("\n");
+                printf("\n");
 
                 // if currently not all the pages are in memory, check if we can load some more
                 if (currently_in_mem != (current_process->mem_req / PAGE_SIZE)) {
@@ -535,7 +535,7 @@ void step_rr(deque_t *process_queue, process_t *current_process, int *simulation
                      * LOAD
                      */
                     int result = swapping_oldest(pages, num_pages, space_available, current_process, process_queue,
-                                                *simulation_time_elapsed, process_pages_req, loading_cost, pages_time);
+                                                *simulation_time_elapsed, process_pages_req, loading_cost, pages_freq);
 
                     /**
                      * Once loading has occurred, apply page fault cost
@@ -645,6 +645,14 @@ void step_rr(deque_t *process_queue, process_t *current_process, int *simulation
 
         // Status used to determine whether the process should be re-inserted into the process queue
         *status = run_process_rr(current_process, quantum_rr);
+
+
+        /**
+         * INCREMENT ALL ACTIVE PAGES AGE BY ONE
+         */
+        if(strstr(memory_opt, "cm")){
+            update_pages_time(pages, pages_freq, num_pages, current_process);
+        }
     }
 
     /**
@@ -659,12 +667,6 @@ void step_rr(deque_t *process_queue, process_t *current_process, int *simulation
      */
     *simulation_time_elapsed = *simulation_time_elapsed + 1;
 
-    /**
-     * INCREMENT ALL ACTIVE PAGES AGE BY ONE
-     */
-    if(strstr(memory_opt, "cm")){
-        update_pages_time(pages_time, num_pages);
-    }
 }
 
 int run_process_rr(process_t *process, int *quantum_rr){

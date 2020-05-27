@@ -2,7 +2,7 @@
 #include "memory_cm.h"
 
 int swapping_oldest(int *pages, int num_pages, int *space_available, process_t *process, deque_t *process_queue,
-                   int simulation_time_elapsed, int process_pages_req, int *loading_cost, int *pages_time){
+                   int simulation_time_elapsed, int process_pages_req, int *loading_cost, int *pages_freq){
     /**
      * Try to load al the pages, but (if space_available < process_pages,
      *      if at least 4 empty (space_available >= 4           => fill until space_available == 0 || pages_remaining == 0),
@@ -20,7 +20,7 @@ int swapping_oldest(int *pages, int num_pages, int *space_available, process_t *
 
     if(process_pages_req <= *space_available) {
 
-        load_pages_cm(pages, num_pages, space_available, process, process_pages_req, loading_cost, pages_time);
+        load_pages_cm(pages, num_pages, space_available, process, process_pages_req, loading_cost, pages_freq);
     }
     /**
      * if not enough space available
@@ -36,7 +36,7 @@ int swapping_oldest(int *pages, int num_pages, int *space_available, process_t *
              * fill as much space as available
              */
             int pages_remaining = *space_available;
-            load_pages_cm(pages, num_pages, space_available, process, pages_remaining, loading_cost, pages_time);
+            load_pages_cm(pages, num_pages, space_available, process, pages_remaining, loading_cost, pages_freq);
         }
             /**
              * if not enough room to fit minimum requirement,
@@ -66,13 +66,13 @@ int swapping_oldest(int *pages, int num_pages, int *space_available, process_t *
                 }
             }
             swap_pages_cm(pages, num_pages, space_available, process, pages_remaining, process_queue,
-                    simulation_time_elapsed, loading_cost, pages_time);
+                    simulation_time_elapsed, loading_cost, pages_freq);
         }
     }
     return 1;
 }
 
-void load_pages_cm(int *pages, int num_pages, int *space_available, process_t *process, int pages_remaining, int *loading_cost, int *pages_time){
+void load_pages_cm(int *pages, int num_pages, int *space_available, process_t *process, int pages_remaining, int *loading_cost, int *pages_freq){
 
     for (int i = 0; i < num_pages; i++) {
         if(pages[i] == -1) {
@@ -83,9 +83,9 @@ void load_pages_cm(int *pages, int num_pages, int *space_available, process_t *p
             *loading_cost = *loading_cost + 2;
 
             /**
-             * TIME
+             * SET FREQUENCY = 1
              */
-            pages_time[i] = 0;
+            pages_freq[i] = 1;
             if(pages_remaining == 0){
                 break;
             }
@@ -95,11 +95,13 @@ void load_pages_cm(int *pages, int num_pages, int *space_available, process_t *p
      * Set occupying memory to true
      */
     process->occupying_memory = 1;
-    print_memory_cm(pages, num_pages, pages_time);
+
+    printf("Memory PostLoad\n");
+    print_memory_cm(pages, num_pages, pages_freq);
 }
 
 void swap_pages_cm(int *pages, int num_pages, int *space_available, process_t *process, int pages_remaining,
-                  deque_t *process_queue, int simulation_time_elapsed, int *loading_cost, int *pages_time){
+                  deque_t *process_queue, int simulation_time_elapsed, int *loading_cost, int *pages_freq){
 
 
     int *mem_addresses = (int *) malloc(sizeof(*mem_addresses) * (process->mem_req / PAGE_SIZE));
@@ -110,12 +112,14 @@ void swap_pages_cm(int *pages, int num_pages, int *space_available, process_t *p
      */
     while(pages_remaining > *space_available) {
         /**
-         * Determine the OLDEST process/pages belong to process and discard its pages from memory ONE BY ONE
+         * Determine the process/pages least frequently accessed and discard its pages from memory ONE BY ONE
          * NOT INCLUDING CURRENT PROCESS
          */
-        print_memory_cm(pages, num_pages, pages_time);
-        int pid = determine_oldest_process(pages, pages_time, num_pages, process);
-        fprintf(stderr, "Oldest Process: %d\n", pid);
+         printf("Memory PreSwap\n");
+        print_memory_cm(pages, num_pages, pages_freq);
+        printf("\n");
+        int pid = determine_least_frequent_process(pages, pages_freq, num_pages, process);
+        fprintf(stderr, "Least frequent access process: %d\n", pid);
 
         /**
          * Retrieve this process from the queue to pass to discard
@@ -130,20 +134,21 @@ void swap_pages_cm(int *pages, int num_pages, int *space_available, process_t *p
         }
 
         // discard its pages from memory
-        discard_pages_cm(pages, num_pages, space_available, oldest_process, pages_remaining, mem_addresses, &mem_addresses_len, pages_time);
+        discard_pages_cm(pages, num_pages, space_available, oldest_process, pages_remaining, mem_addresses, &mem_addresses_len, pages_freq);
     }
-    print_memory_cm(pages, num_pages, pages_time);
+    print_memory_cm(pages, num_pages, pages_freq);
 
     /**
      * Once there is enough space available to store all process' pages, load them
      */
-    load_pages_cm(pages, num_pages, space_available, process, pages_remaining, loading_cost, pages_time);
+    load_pages_cm(pages, num_pages, space_available, process, pages_remaining, loading_cost, pages_freq);
 
     insertion_sort_evicted(mem_addresses, mem_addresses_len);
     print_evicted(simulation_time_elapsed, mem_addresses, mem_addresses_len);
 }
 
-void discard_pages_cm(int *pages, int num_pages, int *space_available, process_t *process, int pages_remaining, int *mem_addresses, int *mem_addresses_len, int *pages_time){
+void discard_pages_cm(int *pages, int num_pages, int *space_available, process_t *process, int pages_remaining,
+        int *mem_addresses, int *mem_addresses_len, int *pages_freq){
     /**
      * DISCARD until space_available == pages_remaining
      * will also print the evicted output
@@ -166,7 +171,7 @@ void discard_pages_cm(int *pages, int num_pages, int *space_available, process_t
                 /**
                  * TIME
                  */
-                pages_time[i] = -1;
+                pages_freq[i] = -1;
 
                 // add it to evicted memory address
                 mem_addresses[*mem_addresses_len] = i;
@@ -190,35 +195,38 @@ void discard_pages_cm(int *pages, int num_pages, int *space_available, process_t
     }
 }
 
-void initialize_time(int *pages_time, int num_pages){
+void initialize_time(int *pages_freq, int num_pages){
 
     for(int i = 0; i < num_pages; i++){
-        pages_time[i] = -1;
+        pages_freq[i] = -1;
     }
 }
 
-void update_pages_time(int *pages_time, int num_pages){
+void update_pages_time(const int *pages, int *pages_freq, int num_pages, process_t *process){
+
     for(int i = 0; i < num_pages; i++){
-        if(pages_time[i] != -1) {
-            pages_time[i] = pages_time[i]+1;
+        if(pages[i] == process->pid) {
+
+            // update access frequency
+            pages_freq[i] = pages_freq[i]+1;
         }
     }
 }
 
-int determine_oldest_process(int *pages, const int *pages_time, int num_pages, process_t *process){
-    int max_age = 0;
-    int max_age_index = 0;
+int determine_least_frequent_process(int *pages, const int *pages_freq, int num_pages, process_t *process){
+    int min_frequency = 100;
+    int min_frequency_index = 0;
     for(int i = 0; i < num_pages; i++){
-        if(pages_time[i] > max_age && pages[i] != process->pid) {
-            max_age = pages_time[i];
-            max_age_index = i;
+        if(pages_freq[i] < min_frequency && pages[i] != process->pid && pages[i] != -1) {
+            min_frequency = pages_freq[i];
+            min_frequency_index = i;
         }
     }
-    return pages[max_age_index];
+    return pages[min_frequency_index];
 }
 
-void print_memory_cm(int *pages, int num_pages, int *pages_time){
+void print_memory_cm(int *pages, int num_pages, int *pages_freq){
     for(int i = 0; i < num_pages; i++){
-        fprintf(stderr, "Page %2d: %2d\tAge: %d\n", i, pages[i], pages_time[i]);
+        fprintf(stderr, "Page %2d: %2d\tFreq: %d\n", i, pages[i], pages_freq[i]);
     }
 }
