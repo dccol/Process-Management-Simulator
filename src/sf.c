@@ -456,7 +456,7 @@ void step_sf(deque_t *process_queue, process_t *current_process, int *simulation
                     /**
                      * LOAD
                      */
-                    int result = swapping_oldest(pages, num_pages, space_available, current_process, process_queue,
+                    int result = swapping_least_frequent(pages, num_pages, space_available, current_process, process_queue,
                                                  *simulation_time_elapsed, process_pages_req, loading_cost, pages_time);
 
                     /**

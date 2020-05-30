@@ -1,8 +1,7 @@
-
 #include "memory_cm.h"
 
-int swapping_oldest(int *pages, int num_pages, int *space_available, process_t *process, deque_t *process_queue,
-                   int simulation_time_elapsed, int process_pages_req, int *loading_cost, int *pages_freq){
+int swapping_least_frequent(int *pages, int num_pages, int *space_available, process_t *process, deque_t *process_queue,
+                    int simulation_time_elapsed, int process_pages_req, int *loading_cost, int *pages_freq){
     /**
      * Try to load al the pages, but (if space_available < process_pages,
      *      if at least 4 empty (space_available >= 4           => fill until space_available == 0 || pages_remaining == 0),
@@ -22,9 +21,9 @@ int swapping_oldest(int *pages, int num_pages, int *space_available, process_t *
 
         load_pages_cm(pages, num_pages, space_available, process, process_pages_req, loading_cost, pages_freq);
     }
-    /**
-     * if not enough space available
-     */
+        /**
+         * if not enough space available
+         */
     else{
 
         /**
@@ -66,7 +65,7 @@ int swapping_oldest(int *pages, int num_pages, int *space_available, process_t *
                 }
             }
             swap_pages_cm(pages, num_pages, space_available, process, pages_remaining, process_queue,
-                    simulation_time_elapsed, loading_cost, pages_freq);
+                          simulation_time_elapsed, loading_cost, pages_freq);
         }
     }
     return 1;
@@ -101,7 +100,7 @@ void load_pages_cm(int *pages, int num_pages, int *space_available, process_t *p
 }
 
 void swap_pages_cm(int *pages, int num_pages, int *space_available, process_t *process, int pages_remaining,
-                  deque_t *process_queue, int simulation_time_elapsed, int *loading_cost, int *pages_freq){
+                   deque_t *process_queue, int simulation_time_elapsed, int *loading_cost, int *pages_freq){
 
 
     int *mem_addresses = (int *) malloc(sizeof(*mem_addresses) * (process->mem_req / PAGE_SIZE));
@@ -115,7 +114,7 @@ void swap_pages_cm(int *pages, int num_pages, int *space_available, process_t *p
          * Determine the process/pages least frequently accessed and discard its pages from memory ONE BY ONE
          * NOT INCLUDING CURRENT PROCESS
          */
-         printf("Memory PreSwap\n");
+        printf("Memory PreSwap\n");
         print_memory_cm(pages, num_pages, pages_freq);
         printf("\n");
         int pid = determine_least_frequent_process(pages, pages_freq, num_pages, process);
@@ -148,7 +147,7 @@ void swap_pages_cm(int *pages, int num_pages, int *space_available, process_t *p
 }
 
 void discard_pages_cm(int *pages, int num_pages, int *space_available, process_t *process, int pages_remaining,
-        int *mem_addresses, int *mem_addresses_len, int *pages_freq){
+                      int *mem_addresses, int *mem_addresses_len, int *pages_freq){
     /**
      * DISCARD until space_available == pages_remaining
      * will also print the evicted output
