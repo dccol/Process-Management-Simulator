@@ -112,9 +112,7 @@ void swap_pages_cm(int *pages, int num_pages, int *space_available, process_t *p
          * Determine the process/pages least frequently accessed and discard its pages from memory ONE BY ONE
          * NOT INCLUDING CURRENT PROCESS
          */
-        printf("Memory PreSwap\n");
         print_memory_cm(pages, num_pages, pages_freq);
-        printf("\n");
         int pid = determine_least_frequent_process(pages, pages_freq, num_pages, process);
         fprintf(stderr, "Least frequent access process: %d\n", pid);
 
