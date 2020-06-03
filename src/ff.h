@@ -46,7 +46,8 @@ void run_process_ff(process_t *process);
  * @return
  */
 void step_ff(deque_t *process_queue, process_t *current_process, long long *simulation_time_elapsed, long long *pages,
-        long long num_pages, long long *space_available, long long *state, long long *loading_cost, char *memory_opt, long long *pages_time, long long *loading_status);
+        long long num_pages, long long *space_available, long long *state, long long *loading_cost, char *memory_opt,
+        long long *pages_freq, long long *loading_status);
 
 /**
  * Takes processes from pending queue and adds them to the process queue to simulate the arrival of a new process

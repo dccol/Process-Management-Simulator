@@ -190,14 +190,14 @@ void discard_pages_cm(long long *pages, long long num_pages, long long *space_av
     }
 }
 
-void initialize_time(long long *pages_freq, long long num_pages){
+void initialize_freq(long long *pages_freq, long long num_pages){
 
     for(long long i = 0; i < num_pages; i++){
         pages_freq[i] = -1;
     }
 }
 
-void update_pages_time(const long long *pages, long long *pages_freq, long long num_pages, process_t *process){
+void update_pages_freq(const long long *pages, long long *pages_freq, long long num_pages, process_t *process){
 
     for(long long i = 0; i < num_pages; i++){
         if(pages[i] == process->pid) {

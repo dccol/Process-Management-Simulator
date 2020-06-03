@@ -28,7 +28,7 @@ void fc_fs(deque_t *pending_process_queue, deque_t *process_queue, char *memory_
     long long *pages = NULL;
     long long space_available = -1;
 
-   long long *pages_time = NULL;
+   long long *pages_freq = NULL;
 
     // STATISTICS VARIABLES
    long long interval_throughput = 0;
@@ -61,8 +61,8 @@ void fc_fs(deque_t *pending_process_queue, deque_t *process_queue, char *memory_
          */
         if(strstr(memory_opt, "cm")){
 
-            pages_time = (long long*)malloc(sizeof(*pages) * num_pages);
-            initialize_time(pages_time, num_pages);
+            pages_freq = (long long*)malloc(sizeof(*pages) * num_pages);
+            initialize_freq(pages_freq, num_pages);
         }
     }
 
@@ -89,7 +89,7 @@ void fc_fs(deque_t *pending_process_queue, deque_t *process_queue, char *memory_
             process_t *place_holder_process = new_process();
 
             step_ff(process_queue, place_holder_process, &simulation_time_elapsed, pages, num_pages,
-                    &space_available, &state, &loading_cost, memory_opt, pages_time, &loading_status);
+                    &space_available, &state, &loading_cost, memory_opt, pages_freq, &loading_status);
 
             /**
              * If interval is over calculate the throughput values
@@ -168,7 +168,7 @@ void fc_fs(deque_t *pending_process_queue, deque_t *process_queue, char *memory_
                  */
                 check_pending(pending_process_queue, process_queue, simulation_time_elapsed);
                 step_ff(process_queue, process, &simulation_time_elapsed, pages, num_pages,
-                        &space_available, &state, &loading_cost, memory_opt, pages_time, &loading_status);
+                        &space_available, &state, &loading_cost, memory_opt, pages_freq, &loading_status);
 
                 /**
                  * If the Process is finished
@@ -183,7 +183,7 @@ void fc_fs(deque_t *pending_process_queue, deque_t *process_queue, char *memory_
 
                         //print_evicted(pages, num_pages, process, simulation_time_elapsed);
 
-                        discard_pages(pages, num_pages, &space_available, process, simulation_time_elapsed, pages_time);
+                        discard_pages(pages, num_pages, &space_available, process, simulation_time_elapsed, pages_freq);
                     }
                     printf("%lld, FINISHED, id=%lld, proc-remaining=%d\n", simulation_time_elapsed,
                            process->pid, process_queue->size);
@@ -233,7 +233,7 @@ void fc_fs(deque_t *pending_process_queue, deque_t *process_queue, char *memory_
                              interval_throughput);
     }
     /**
-     * PRlong long STATISTICS
+     * PRINT STATISTICS
      */
     // Round up if decimal
     if((throughput_av - (int)throughput_av) != 0){
@@ -266,7 +266,8 @@ void fc_fs(deque_t *pending_process_queue, deque_t *process_queue, char *memory_
  * abstraction of a unit of time (second)
  */
 void step_ff(deque_t *process_queue, process_t *current_process,long long *simulation_time_elapsed, long long *pages,
-        long long num_pages, long long *space_available, long long *state, long long *loading_cost, char *memory_opt,long long *pages_time,long long *loading_status){
+        long long num_pages, long long *space_available, long long *state, long long *loading_cost, char *memory_opt,
+        long long *pages_freq, long long *loading_status){
 
     /**
      * IF LOADING => LOAD PROCESS PAGES INTO MEMORY
@@ -280,9 +281,9 @@ void step_ff(deque_t *process_queue, process_t *current_process,long long *simul
         if (strstr(memory_opt, "p")) {
             // how long we stay in loaded is based on 2*num loaded pages
             if (current_process->occupying_memory == -1) {
-                swapping_x(pages, num_pages, space_available, current_process, process_queue, *simulation_time_elapsed, pages_time);
+                swapping_x(pages, num_pages, space_available, current_process, process_queue, *simulation_time_elapsed, pages_freq);
                 /**
-                 * PRlong long TO STDOUT
+                 * PRINT TO STDOUT
                  */
                 print_load(pages, num_pages, space_available, current_process, loading_cost, simulation_time_elapsed);
 
@@ -349,7 +350,7 @@ void step_ff(deque_t *process_queue, process_t *current_process,long long *simul
 
 
                         /**
-                         * PRlong long TO STDOUT
+                         * PRINT TO STDOUT
                          */
                         print_load(pages, num_pages, space_available, current_process, loading_cost,
                                    simulation_time_elapsed);
@@ -453,7 +454,7 @@ void step_ff(deque_t *process_queue, process_t *current_process,long long *simul
                      * LOAD
                      */
                    long long result = swapping_least_frequent(pages, num_pages, space_available, current_process, process_queue,
-                                                 *simulation_time_elapsed, process_pages_req, loading_cost, pages_time);
+                                                 *simulation_time_elapsed, process_pages_req, loading_cost, pages_freq);
 
                     /**
                      * Once loading has occurred, apply page fault cost
@@ -475,7 +476,7 @@ void step_ff(deque_t *process_queue, process_t *current_process,long long *simul
 
 
                         /**
-                         * PRlong long TO STDOUT
+                         * PRINT TO STDOUT
                          */
                         print_load(pages, num_pages, space_available, current_process, loading_cost,
                                    simulation_time_elapsed);
@@ -558,6 +559,13 @@ void step_ff(deque_t *process_queue, process_t *current_process,long long *simul
 
         fprintf(stderr, "%lld, RUNNING, id=%lld, remaining-time=%lld\n", *simulation_time_elapsed, current_process->pid, current_process->time_remaining);
         run_process_ff(current_process);
+
+        /**
+         * INCREMENT ALL ACTIVE PAGES AGE BY ONE
+         */
+        if(strstr(memory_opt, "cm")){
+            update_pages_freq(pages, pages_freq, num_pages, current_process);
+        }
     }
 
     /**

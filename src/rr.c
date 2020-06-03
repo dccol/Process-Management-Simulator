@@ -67,7 +67,7 @@ void rr(deque_t *pending_process_queue, deque_t *process_queue, char *memory_opt
         if(strstr(memory_opt, "cm")){
 
             pages_freq= (long long*)malloc(sizeof(*pages) * num_pages);
-            initialize_time(pages_freq, num_pages);
+            initialize_freq(pages_freq, num_pages);
         }
     }
 
@@ -190,7 +190,7 @@ void rr(deque_t *pending_process_queue, deque_t *process_queue, char *memory_opt
             }
 
             /**
-             * Prlong long output to stdout
+             * Print output to stdout
              */
             if (strstr(memory_opt, "u")) {
                 printf("%lld, RUNNING, id=%lld, remaining-time=%lld\n", simulation_time_elapsed, process->pid,
@@ -242,7 +242,7 @@ void rr(deque_t *pending_process_queue, deque_t *process_queue, char *memory_opt
                     }
 
                     /**
-                     * PRlong long FINISHED OUTPUT
+                     * PRINT FINISHED OUTPUT
                      */
                     printf("%lld, FINISHED, id=%lld, proc-remaining=%d\n", simulation_time_elapsed,
                            process->pid, process_queue->size);
@@ -291,7 +291,7 @@ void rr(deque_t *pending_process_queue, deque_t *process_queue, char *memory_opt
                              interval_throughput);
     }
     /**
-     * PRlong long STATISTICS
+     * PRINT STATISTICS
      */
     // Round up if decimal
     if((throughput_av - (int)throughput_av) != 0){
@@ -348,7 +348,7 @@ void step_rr(deque_t *process_queue, process_t *current_process, long long *simu
                 swapping_x(pages, num_pages, space_available, current_process, process_queue, *simulation_time_elapsed, pages_freq);
 
                 /**
-                 * PRlong long TO STDOUT
+                 * PRINT TO STDOUT
                  */
                 print_load(pages, num_pages, space_available, current_process, loading_cost, simulation_time_elapsed);
 
@@ -431,7 +431,7 @@ void step_rr(deque_t *process_queue, process_t *current_process, long long *simu
 
 
                         /**
-                         * PRlong long TO STDOUT
+                         * PRINT TO STDOUT
                          */
                         print_load(pages, num_pages, space_available, current_process, loading_cost,
                                    simulation_time_elapsed);
@@ -555,7 +555,7 @@ void step_rr(deque_t *process_queue, process_t *current_process, long long *simu
 
 
                         /**
-                         * PRlong long TO STDOUT
+                         * PRINT TO STDOUT
                          */
                         print_load(pages, num_pages, space_available, current_process, loading_cost,
                                    simulation_time_elapsed);
@@ -649,7 +649,7 @@ void step_rr(deque_t *process_queue, process_t *current_process, long long *simu
          * INCREMENT ALL ACTIVE PAGES AGE BY ONE
          */
         if(strstr(memory_opt, "cm")){
-            update_pages_time(pages, pages_freq, num_pages, current_process);
+            update_pages_freq(pages, pages_freq, num_pages, current_process);
         }
     }
 

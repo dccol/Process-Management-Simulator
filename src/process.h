@@ -19,6 +19,12 @@ typedef struct process {
 
 process_t *new_process();
 
+/**
+ * Populates process fields
+ * @param process
+ * @param i
+ * @param data
+ */
 void populate_process_t(process_t *process, long long i, char* data);
 
 
