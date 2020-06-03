@@ -8,7 +8,7 @@
  */
 typedef struct process {
     int time_rec;
-    int pid;
+    long long pid;
     int mem_req;
     int time_remaining;
     int job_time;

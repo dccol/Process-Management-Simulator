@@ -116,7 +116,7 @@ int deque_size(deque_t *deque) {
 void print_deque(deque_t *deque) {
     node_t *curr = deque->head;
     while(curr != NULL){
-        printf("%d\t", curr->data.process->pid);
+        printf("%lld\t", curr->data.process->pid);
         curr = curr->next;
     }
     printf("\n");

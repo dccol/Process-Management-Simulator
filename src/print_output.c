@@ -28,7 +28,7 @@ void print_load(int *pages, int num_pages, const int *space_available, process_t
     find_process_mem(pages, num_pages, process, mem_addresses);
 
     // Print
-    printf("%d, RUNNING, id=%d, remaining-time=%d, load-time=%d, mem-usage=%2.0lf%%, mem-addresses=[",
+    printf("%d, RUNNING, id=%lld, remaining-time=%d, load-time=%d, mem-usage=%2.0lf%%, mem-addresses=[",
            *simulation_time_elapsed, process->pid, process->time_remaining, *loading_cost, mem_usage);
     for(int i = 0; i < currently_in_mem -1 ; i++){
         printf("%d,", mem_addresses[i]);

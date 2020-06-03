@@ -156,7 +156,7 @@ void sf(deque_t *pending_process_queue, deque_t *process_queue, char *memory_opt
              * Print output to stdout
              */
             if (strstr(memory_opt, "u")) {
-                printf("%d, RUNNING, id=%d, remaining-time=%d\n", simulation_time_elapsed, process->pid,
+                printf("%d, RUNNING, id=%lld, remaining-time=%d\n", simulation_time_elapsed, process->pid,
                        process->time_remaining);
             }
 
@@ -186,7 +186,7 @@ void sf(deque_t *pending_process_queue, deque_t *process_queue, char *memory_opt
 
                         discard_pages(pages, num_pages, &space_available, process, simulation_time_elapsed, pages_time);
                     }
-                    printf("%d, FINISHED, id=%d, proc-remaining=%d\n", simulation_time_elapsed,
+                    printf("%d, FINISHED, id=%lld, proc-remaining=%d\n", simulation_time_elapsed,
                            process->pid, process_queue->size);
 
                     /**
@@ -275,7 +275,7 @@ void step_sf(deque_t *process_queue, process_t *current_process, int *simulation
     if(*state == LOADING){
 
         // decrement time takes to load
-        fprintf(stderr, "%d, RUNNING, id=%d, remaining-time=%d, load-time=%d\n",
+        fprintf(stderr, "%d, RUNNING, id=%lld, remaining-time=%d, load-time=%d\n",
                 *simulation_time_elapsed, current_process->pid, current_process->time_remaining, *loading_cost);
 
         if (strstr(memory_opt, "p")) {
@@ -318,7 +318,7 @@ void step_sf(deque_t *process_queue, process_t *current_process, int *simulation
                 int currently_in_mem = count_process_mem(pages, num_pages, current_process);
                 // Pass in total pages NOT already in memory
                 int process_pages_req = (current_process->mem_req / PAGE_SIZE) - currently_in_mem;
-                fprintf(stderr, "Process %d would like %d pages of memory\n", current_process->pid, process_pages_req);
+                fprintf(stderr, "Process %lld would like %d pages of memory\n", current_process->pid, process_pages_req);
 
                 //printf("Memory Preload\n");
                 print_memory(pages, num_pages);
@@ -444,7 +444,7 @@ void step_sf(deque_t *process_queue, process_t *current_process, int *simulation
                 int currently_in_mem = count_process_mem(pages, num_pages, current_process);
                 // Pass in total pages NOT already in memory
                 int process_pages_req = (current_process->mem_req / PAGE_SIZE) - currently_in_mem;
-                fprintf(stderr, "Process %d would like %d pages of memory\n", current_process->pid, process_pages_req);
+                fprintf(stderr, "Process %lld would like %d pages of memory\n", current_process->pid, process_pages_req);
 
                 //printf("Memory Preload\n");
                 print_memory(pages, num_pages);
@@ -562,7 +562,7 @@ void step_sf(deque_t *process_queue, process_t *current_process, int *simulation
     else if(*state == RUNNING) {
 
 
-        fprintf(stderr, "%d, RUNNING, id=%d, remaining-time=%d\n", *simulation_time_elapsed, current_process->pid, current_process->time_remaining);
+        fprintf(stderr, "%d, RUNNING, id=%lld, remaining-time=%d\n", *simulation_time_elapsed, current_process->pid, current_process->time_remaining);
         int status = run_process_sf(current_process);
     }
 
@@ -628,7 +628,7 @@ void check_pending_sf(deque_t *pending_process_queue, deque_t *process_queue, in
         insertion_sort_pending(processes_to_insert, index);
 
         for (int i = 0; i < index; i++) {
-            fprintf(stderr,"%3d, Process ID: %d arrived\n", simulation_time, processes_to_insert[i].process->pid);
+            fprintf(stderr,"%3d, Process ID: %lld arrived\n", simulation_time, processes_to_insert[i].process->pid);
             deque_insert(process_queue, processes_to_insert[i]);
         }
 

@@ -193,7 +193,7 @@ void rr(deque_t *pending_process_queue, deque_t *process_queue, char *memory_opt
              * Print output to stdout
              */
             if (strstr(memory_opt, "u")) {
-                printf("%d, RUNNING, id=%d, remaining-time=%d\n", simulation_time_elapsed, process->pid,
+                printf("%d, RUNNING, id=%lld, remaining-time=%d\n", simulation_time_elapsed, process->pid,
                        process->time_remaining);
             }
 
@@ -219,7 +219,7 @@ void rr(deque_t *pending_process_queue, deque_t *process_queue, char *memory_opt
                  * If the process is not done, reinsert it into the process queue
                  */
                 if (status == NOT_DONE && quantum_rr == 0) {
-                    fprintf(stderr,"%d, Inserting Process %d back into the queue. It has %d seconds left\n", simulation_time_elapsed, process->pid,
+                    fprintf(stderr,"%d, Inserting Process %lld back into the queue. It has %d seconds left\n", simulation_time_elapsed, process->pid,
                             process->time_remaining);
 
                     deque_insert(process_queue, data);
@@ -244,7 +244,7 @@ void rr(deque_t *pending_process_queue, deque_t *process_queue, char *memory_opt
                     /**
                      * PRINT FINISHED OUTPUT
                      */
-                    printf("%d, FINISHED, id=%d, proc-remaining=%d\n", simulation_time_elapsed,
+                    printf("%d, FINISHED, id=%lld, proc-remaining=%d\n", simulation_time_elapsed,
                            process->pid, process_queue->size);
 
                     /**
@@ -330,7 +330,7 @@ void step_rr(deque_t *process_queue, process_t *current_process, int *simulation
 
     if(*state == LOADING) {
 
-        fprintf(stderr, "%d, RUNNING, id=%d, remaining-time=%d, load-time=%d\n",
+        fprintf(stderr, "%d, RUNNING, id=%lld, remaining-time=%d, load-time=%d\n",
                 *simulation_time_elapsed, current_process->pid, current_process->time_remaining, *loading_cost);
 
         /**
@@ -396,7 +396,7 @@ void step_rr(deque_t *process_queue, process_t *current_process, int *simulation
                 int currently_in_mem = count_process_mem(pages, num_pages, current_process);
                 // Pass in total pages NOT already in memory
                 int process_pages_req = (current_process->mem_req / PAGE_SIZE) - currently_in_mem;
-                fprintf(stderr, "Process %d would like %d pages of memory\n", current_process->pid, process_pages_req);
+                fprintf(stderr, "Process %lld would like %d pages of memory\n", current_process->pid, process_pages_req);
 
                 //printf("Memory Preload\n");
                 print_memory(pages, num_pages);
@@ -522,7 +522,7 @@ void step_rr(deque_t *process_queue, process_t *current_process, int *simulation
                 int currently_in_mem = count_process_mem(pages, num_pages, current_process);
                 // Pass in total pages NOT already in memory
                 int process_pages_req = (current_process->mem_req / PAGE_SIZE) - currently_in_mem;
-                fprintf(stderr, "Process %d would like %d pages of memory\n", current_process->pid, process_pages_req);
+                fprintf(stderr, "Process %lld would like %d pages of memory\n", current_process->pid, process_pages_req);
 
                 printf("Memory Preload\n");
                 print_memory(pages, num_pages);
@@ -640,7 +640,7 @@ void step_rr(deque_t *process_queue, process_t *current_process, int *simulation
      */
     else if(*state == RUNNING) {
 
-        fprintf(stderr, "%d, RUNNING, id=%d, remaining-time=%d, quantum=%d\n", *simulation_time_elapsed, current_process->pid,
+        fprintf(stderr, "%d, RUNNING, id=%lld, remaining-time=%d, quantum=%d\n", *simulation_time_elapsed, current_process->pid,
                 current_process->time_remaining, *quantum_rr);
 
         // Status used to determine whether the process should be re-inserted into the process queue
@@ -721,7 +721,7 @@ void check_pending_rr(deque_t *pending_process_queue, deque_t *process_queue, in
         insertion_sort_pending(processes_to_insert, index);
 
         for (int i = 0; i < index; i++) {
-            fprintf(stderr, "%3d, Process ID: %d\n", simulation_time, processes_to_insert[i].process->pid);
+            fprintf(stderr, "%3d, Process ID: %lld\n", simulation_time, processes_to_insert[i].process->pid);
             deque_insert(process_queue, processes_to_insert[i]);
         }
     }
