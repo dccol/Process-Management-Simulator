@@ -524,9 +524,7 @@ void step_rr(deque_t *process_queue, process_t *current_process, int *simulation
                 int process_pages_req = (current_process->mem_req / PAGE_SIZE) - currently_in_mem;
                 fprintf(stderr, "Process %lld would like %d pages of memory\n", current_process->pid, process_pages_req);
 
-                printf("Memory Preload\n");
                 print_memory(pages, num_pages);
-                printf("\n");
 
                 // if currently not all the pages are in memory, check if we can load some more
                 if (currently_in_mem != (current_process->mem_req / PAGE_SIZE)) {

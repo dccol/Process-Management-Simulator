@@ -94,8 +94,6 @@ void load_pages_cm(int *pages, int num_pages, int *space_available, process_t *p
      * Set occupying memory to true
      */
     process->occupying_memory = 1;
-
-    printf("Memory PostLoad\n");
     print_memory_cm(pages, num_pages, pages_freq);
 }
 
