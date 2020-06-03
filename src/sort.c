@@ -5,9 +5,9 @@
 
 #include "sort.h"
 //
-void insertion_sort_pending(data_t *array, int n) {
+void insertion_sort_pending(data_t *array, long long n) {
 
-    int i, j;
+    long long i, j;
     data_t next;
 
     for (i = 1; i < n; i++) {
@@ -22,10 +22,10 @@ void insertion_sort_pending(data_t *array, int n) {
     }
 }
 
-void insertion_sort_evicted(int *array, int n) {
+void insertion_sort_evicted(long long *array, long long n) {
 
-    int i, j;
-    int next;
+    long long i, j;
+    long long next;
 
     for (i = 1; i < n; i++) {
         next = array[i];
@@ -39,13 +39,13 @@ void insertion_sort_evicted(int *array, int n) {
     }
 }
 
-void insertion_sort_queue(deque_t *process_queue, int n) {
+void insertion_sort_queue(deque_t *process_queue, long long n) {
 
     // TAKE ALL THE PROCESSES AND STORE THEM IN AN ARRAY
     //process_t *process = process_queue->foot->data.process;
     data_t *array = (data_t*)malloc(sizeof(*array) * 10);
 
-    int index = 0;
+    long long index = 0;
     while(process_queue->foot != NULL){
         data_t data = deque_remove(process_queue);
         array[index] = data;
@@ -53,7 +53,7 @@ void insertion_sort_queue(deque_t *process_queue, int n) {
     }
 
     // SORT ARRAY BASED ON TIME REMAINING
-    int i, j;
+    long long i, j;
     data_t next;
 
     for (i = 1; i < n; i++) {

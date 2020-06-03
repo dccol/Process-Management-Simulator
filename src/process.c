@@ -16,9 +16,9 @@ process_t *new_process() {
     return process;
 }
 
-void populate_process_t(process_t *process, int i, char* data){
+void populate_process_t(process_t *process, long long i, char* data){
 
-    int i_data = atoi(data);
+    long long i_data = atoi(data);
 
     if(i == 0){ // time_rec
         process->time_rec = i_data;

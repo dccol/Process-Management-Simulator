@@ -1,9 +1,9 @@
 
 #include "round.h"
 
-int round_up(double n){
+long long round_up(double n){
 
-    int result;
+    long long result;
     result = (int)n;
     return result+1;
 }

@@ -11,17 +11,17 @@
 #include "print_output.h"
 #include "sort.h"
 
-int virtual_memory(int *pages, int num_pages, int *space_available, process_t *process, deque_t *process_queue,
-        int simulation_time_elapsed, int process_pages_req, int *loading_cost);
+long long virtual_memory(long long *pages, long long num_pages, long long *space_available, process_t *process, deque_t *process_queue,
+        long long simulation_time_elapsed, long long process_pages_req, long long *loading_cost);
 
-void load_pages_v(int *pages, int num_pages, int *space_available, process_t *process, int pages_remaining, int *loading_cost);
+void load_pages_v(long long *pages, long long num_pages, long long *space_available, process_t *process, long long pages_remaining, long long *loading_cost);
 
-void swap_pages_v(int *pages, int num_pages, int *space_available, process_t *process, int pages_remaining,
-        deque_t *process_queue, int simulation_time_elapsed, int *loading_cost);
+void swap_pages_v(long long *pages, long long num_pages, long long *space_available, process_t *process, long long pages_remaining,
+        deque_t *process_queue, long long simulation_time_elapsed, long long *loading_cost);
 
-void discard_pages_v(int *pages, int num_pages, int *space_available, process_t *process,
-        int pages_remaining, int *mem_addresses, int *mem_addresses_len);
+void discard_pages_v(long long *pages, long long num_pages, long long *space_available, process_t *process,
+        long long pages_remaining, long long *mem_addresses, long long *mem_addresses_len);
 
-int count_process_mem(const int *pages, int num_pages, process_t *process);
+long long count_process_mem(const long long *pages, long long num_pages, process_t *process);
 
 #endif

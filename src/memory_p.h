@@ -12,17 +12,17 @@
 
 #define PAGE_SIZE 4
 
-void swapping_x(int *pages, int num_pages, int *space_available, process_t *process, deque_t *process_queue, int simulation_time_elapsed, int *pages_time);
+void swapping_x(long long *pages, long long num_pages, long long *space_available, process_t *process, deque_t *process_queue, long long simulation_time_elapsed, long long *pages_time);
 
-void initialize_empty_pages(int *pages, int num_pages);
+void initialize_empty_pages(long long *pages, long long num_pages);
 
-void load_pages(int *pages, int num_pages, int *space_available, process_t *process, int pages_remaining);
+void load_pages(long long *pages, long long num_pages, long long *space_available, process_t *process, long long pages_remaining);
 
-void swap_pages(int *pages, int num_pages, int *space_available, process_t *process, int pages_remaining, deque_t *process_queue, int simulation_time_elapsed, int *pages_time);
+void swap_pages(long long *pages, long long num_pages, long long *space_available, process_t *process, long long pages_remaining, deque_t *process_queue, long long simulation_time_elapsed, long long *pages_time);
 
-void discard_pages(int *pages, int num_pages, int *space_available, process_t *least_recent_process, int simulation_time_elapsed, int *pages_time);
+void discard_pages(long long *pages, long long num_pages, long long *space_available, process_t *least_recent_process, long long simulation_time_elapsed, long long *pages_time);
 
-void print_memory(int *pages, int num_pages);
+void print_memory(long long *pages, long long num_pages);
 
-void find_process_mem(const int *pages, int num_pages, process_t *process, int *mem_addresses);
+void find_process_mem(const long long *pages, long long num_pages, process_t *process, long long *mem_addresses);
 #endif

@@ -1,7 +1,7 @@
 //
 #include "memory_v.h"
-int virtual_memory(int *pages, int num_pages, int *space_available, process_t *process, deque_t *process_queue,
-        int simulation_time_elapsed, int process_pages_req, int *loading_cost){
+long long virtual_memory(long long *pages, long long num_pages, long long *space_available, process_t *process, deque_t *process_queue,
+        long long simulation_time_elapsed, long long process_pages_req, long long *loading_cost){
 
     /**
     * Try to load al the pages, but (if space_available < process_pages,
@@ -9,7 +9,7 @@ int virtual_memory(int *pages, int num_pages, int *space_available, process_t *p
     *      if not at least 4 empty pages (space_available < 4) => remove least recent by by page until space_available == 4;
     */
 
-    int currently_in_mem = count_process_mem(pages, num_pages, process);
+    long long currently_in_mem = count_process_mem(pages, num_pages, process);
 
     /**
      *  If the process already meet memory requirement, and there is no space in memory to load additional pages
@@ -36,7 +36,7 @@ int virtual_memory(int *pages, int num_pages, int *space_available, process_t *p
             /**
              * fill as much space as available
              */
-            int pages_remaining = *space_available;
+            long long pages_remaining = *space_available;
             load_pages_v(pages, num_pages, space_available, process, pages_remaining, loading_cost);
         }
         /**
@@ -47,7 +47,7 @@ int virtual_memory(int *pages, int num_pages, int *space_available, process_t *p
             /**
              * If we are swapping check to see if any of the processes pages are currently in memory
              */
-            int pages_remaining;
+            long long pages_remaining;
             currently_in_mem = count_process_mem(pages, num_pages, process);
             /**
              * pass pages_remaining in to be 4 so that once 4 pages are available then it will break the discard process
@@ -73,9 +73,9 @@ int virtual_memory(int *pages, int num_pages, int *space_available, process_t *p
     return 1;
 }
 
-void load_pages_v(int *pages, int num_pages, int *space_available, process_t *process, int pages_remaining, int *loading_cost){
+void load_pages_v(long long *pages, long long num_pages, long long *space_available, process_t *process, long long pages_remaining, long long *loading_cost){
 
-    for (int i = 0; i < num_pages; i++) {
+    for (long long i = 0; i < num_pages; i++) {
         if(pages[i] == -1) {
 
             pages[i] = process->pid;
@@ -94,11 +94,11 @@ void load_pages_v(int *pages, int num_pages, int *space_available, process_t *pr
     print_memory(pages, num_pages);
 }
 
-void swap_pages_v(int *pages, int num_pages, int *space_available, process_t *process, int pages_remaining,
-        deque_t *process_queue, int simulation_time_elapsed, int *loading_cost){
+void swap_pages_v(long long *pages, long long num_pages, long long *space_available, process_t *process, long long pages_remaining,
+        deque_t *process_queue, long long simulation_time_elapsed, long long *loading_cost){
 
-    int *mem_addresses = (int *) malloc(sizeof(*mem_addresses) * (process->mem_req / PAGE_SIZE));
-    int mem_addresses_len = 0;
+    long long *mem_addresses = (long long *) malloc(sizeof(*mem_addresses) * (process->mem_req / PAGE_SIZE));
+    long long mem_addresses_len = 0;
 
     process_t *least_recent_process = new_process();
     node_t *curr = process_queue->foot;
@@ -133,17 +133,17 @@ void swap_pages_v(int *pages, int num_pages, int *space_available, process_t *pr
     print_evicted(simulation_time_elapsed, mem_addresses, mem_addresses_len);
 }
 
-void discard_pages_v(int *pages, int num_pages, int *space_available, process_t *process, int pages_remaining, int *mem_addresses, int *mem_addresses_len){
+void discard_pages_v(long long *pages, long long num_pages, long long *space_available, process_t *process, long long pages_remaining, long long *mem_addresses, long long *mem_addresses_len){
     /**
      * DISCARD until space_available == pages_remaining
-     * will also print the evicted output
+     * will also prlong long the evicted output
      */
 
     // remove process pages from memory until space available == 4
-    int count = 0;
-    int removed_count = 0;
-    int remove = 1;
-    for(int i = 0; i < num_pages; i++){
+    long long count = 0;
+    long long removed_count = 0;
+    long long remove = 1;
+    for(long long i = 0; i < num_pages; i++){
         if(pages[i] == process->pid){
             count++;
 
@@ -175,10 +175,10 @@ void discard_pages_v(int *pages, int num_pages, int *space_available, process_t 
     }
 }
 
-int count_process_mem(const int *pages, int num_pages, process_t *process) {
+long long count_process_mem(const long long *pages, long long num_pages, process_t *process) {
 
-    int count = 0;
-    for(int i = 0; i < num_pages; i++){
+    long long count = 0;
+    for(long long i = 0; i < num_pages; i++){
 
         // if contains the id we are looking for, update count
         if(pages[i] == process->pid){

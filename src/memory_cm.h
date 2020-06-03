@@ -11,22 +11,22 @@
 #include "print_output.h"
 #include "sort.h"
 
-int swapping_least_frequent(int *pages, int num_pages, int *space_available, process_t *process, deque_t *process_queue,
-                    int simulation_time_elapsed, int process_pages_req, int *loading_cost, int *pages_freq);
+long long swapping_least_frequent(long long *pages, long long num_pages, long long *space_available, process_t *process, deque_t *process_queue,
+                    long long simulation_time_elapsed, long long process_pages_req, long long *loading_cost, long long *pages_freq);
 
-void load_pages_cm(int *pages, int num_pages, int *space_available, process_t *process, int pages_remaining, int *loading_cost, int *pages_freq);
+void load_pages_cm(long long *pages, long long num_pages, long long *space_available, process_t *process, long long pages_remaining, long long *loading_cost, long long *pages_freq);
 
-void swap_pages_cm(int *pages, int num_pages, int *space_available, process_t *process, int pages_remaining,
-                   deque_t *process_queue, int simulation_time_elapsed, int *loading_cost, int *pages_freq);
+void swap_pages_cm(long long *pages, long long num_pages, long long *space_available, process_t *process, long long pages_remaining,
+                   deque_t *process_queue, long long simulation_time_elapsed, long long *loading_cost, long long *pages_freq);
 
-void discard_pages_cm(int *pages, int num_pages, int *space_available, process_t *process,
-        int pages_remaining, int *mem_addresses, int *mem_addresses_len, int *pages_freq);
+void discard_pages_cm(long long *pages, long long num_pages, long long *space_available, process_t *process,
+        long long pages_remaining, long long *mem_addresses, long long *mem_addresses_len, long long *pages_freq);
 
-void initialize_time(int *pages_freq, int num_pages);
+void initialize_time(long long *pages_freq, long long num_pages);
 
-void update_pages_time(const int *pages, int *pages_freq, int num_pages, process_t *process);
+void update_pages_time(const long long *pages, long long *pages_freq, long long num_pages, process_t *process);
 
-int determine_least_frequent_process(int *pages, const int *pages_freq, int num_pages, process_t *process);
+long long determine_least_frequent_process(long long *pages, const long long *pages_freq, long long num_pages, process_t *process);
 
-void print_memory_cm(int *pages, int num_pages, int *pages_freq);
+void print_memory_cm(long long *pages, long long num_pages, long long *pages_freq);
 #endif

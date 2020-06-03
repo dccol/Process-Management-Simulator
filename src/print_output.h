@@ -11,8 +11,8 @@
 #include "round.h"
 
 
-void print_evicted(int simulation_time_elapsed, int *mem_addresses, int mem_addresses_len);
+void print_evicted(long long simulation_time_elapsed, long long *mem_addresses, long long mem_addresses_len);
 
-void print_load(int *pages, int num_pages, const int *space_available, process_t *process, const int *loading_cost, const int *simulation_time_elapsed);
+void print_load(long long *pages, long long num_pages, const long long *space_available, process_t *process, const long long *loading_cost, const long long *simulation_time_elapsed);
 
 #endif

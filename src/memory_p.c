@@ -1,10 +1,10 @@
 
 #include "memory_p.h"
 
-void swapping_x(int *pages, int num_pages, int *space_available, process_t *process, deque_t *process_queue, int simulation_time_elapsed, int *pages_time){
+void swapping_x(long long *pages, long long num_pages, long long *space_available, process_t *process, deque_t *process_queue, long long simulation_time_elapsed, long long *pages_time){
 
     // Pages remaining to load
-    int process_pages_req = process->mem_req / PAGE_SIZE;
+    long long process_pages_req = process->mem_req / PAGE_SIZE;
     //printf("Process %d needs %d pages of memory\n", process->pid, process_pages_req);
 
     /**
@@ -20,15 +20,15 @@ void swapping_x(int *pages, int num_pages, int *space_available, process_t *proc
 
 }
 
-void initialize_empty_pages(int *pages, int num_pages){
-    for(int i = 0; i < num_pages; i++){
+void initialize_empty_pages(long long *pages, long long num_pages){
+    for(long long i = 0; i < num_pages; i++){
         pages[i] = -1;
     }
 }
 
-void load_pages(int *pages, int num_pages, int *space_available, process_t *process, int pages_remaining) {
+void load_pages(long long *pages, long long num_pages, long long *space_available, process_t *process, long long pages_remaining) {
 
-    for (int i = 0; i < num_pages; i++) {
+    for (long long i = 0; i < num_pages; i++) {
         if(pages[i] == -1) {
 
             pages[i] = process->pid;
@@ -45,7 +45,7 @@ void load_pages(int *pages, int num_pages, int *space_available, process_t *proc
     process->occupying_memory = 1;
 }
 
-void swap_pages(int *pages, int num_pages, int *space_available, process_t *process, int pages_remaining, deque_t *process_queue, int simulation_time_elapsed, int *pages_time){
+void swap_pages(long long *pages, long long num_pages, long long *space_available, process_t *process, long long pages_remaining, deque_t *process_queue, long long simulation_time_elapsed, long long *pages_time){
 
     process_t *least_recent_process = new_process();
     node_t *curr = process_queue->foot;
@@ -76,16 +76,16 @@ void swap_pages(int *pages, int num_pages, int *space_available, process_t *proc
     load_pages(pages, num_pages, space_available, process, pages_remaining);
 }
 
-void discard_pages(int *pages, int num_pages, int *space_available, process_t *process, int simulation_time_elapsed, int *pages_time){
+void discard_pages(long long *pages, long long num_pages, long long *space_available, process_t *process, long long simulation_time_elapsed, long long *pages_time){
     /**
      * DISCARD
      */
 
-    int *mem_addresses = (int *) malloc(sizeof(*mem_addresses) * (process->mem_req / PAGE_SIZE));
-    int index = 0;
+    long long *mem_addresses = (long long *) malloc(sizeof(*mem_addresses) * (process->mem_req / PAGE_SIZE));
+    long long index = 0;
 
     // remove all process pages from memory
-    for(int i = 0; i < num_pages; i++){
+    for(long long i = 0; i < num_pages; i++){
         if(pages[i] == process->pid){
             pages[i] = -1;
             *space_available = *space_available+1;
@@ -106,20 +106,20 @@ void discard_pages(int *pages, int num_pages, int *space_available, process_t *p
     process->occupying_memory = -1;
 
     /**
-     * Print Evicted
+     * Prlong long Evicted
      */
     print_evicted(simulation_time_elapsed, mem_addresses, index);
 }
 
-void print_memory(int *pages, int num_pages){
-    for(int i = 0; i < num_pages; i++){
-        fprintf(stderr, "Page %2d: %2d\n", i, pages[i]);
+void print_memory(long long *pages, long long num_pages){
+    for(long long i = 0; i < num_pages; i++){
+        fprintf(stderr, "Page %2lld: %2lld\n", i, pages[i]);
     }
 }
-void find_process_mem(const int *pages, int num_pages, process_t *process, int *mem_addresses) {
+void find_process_mem(const long long *pages, long long num_pages, process_t *process, long long *mem_addresses) {
 
-    int index = 0;
-    for(int i = 0; i < num_pages; i++){
+    long long index = 0;
+    for(long long i = 0; i < num_pages; i++){
 
         // if contains the id we are looking for, append to mem_addresses
         if(pages[i] == process->pid){

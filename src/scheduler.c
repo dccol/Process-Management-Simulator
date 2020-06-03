@@ -21,7 +21,7 @@
 
 void initialize_queue(FILE *processes_file, deque_t *pending_process_queue);
 
-int main(int argc, char **argv) {
+long long main(long long argc, char **argv) {
 
     // INSTANTIATE PENDING QUEUE
     deque_t *pending_process_queue = new_deque();
@@ -30,11 +30,11 @@ int main(int argc, char **argv) {
     deque_t *process_queue = new_deque();
 
     // Options
-    int option_index = 0;
+    long long option_index = 0;
     char *schedule_alg = NULL;
     char *memory_opt = NULL;
-    int memory_size = 0;
-    int quantum = 10;
+    long long memory_size = 0;
+    long long quantum = 10;
 
     FILE *processes_file;
 
@@ -98,7 +98,7 @@ void initialize_queue(FILE *processes_file, deque_t *pending_process_queue){
         // SPLIT INTO VARIABLES
         char *token = strtok(str, " ");
 
-        int i = 0;
+        long long i = 0;
         while (token != NULL) {
 
             // POPULATE PROCESS DATA STRUCTURE

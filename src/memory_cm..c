@@ -1,14 +1,14 @@
 #include "memory_cm.h"
 
-int swapping_least_frequent(int *pages, int num_pages, int *space_available, process_t *process, deque_t *process_queue,
-                    int simulation_time_elapsed, int process_pages_req, int *loading_cost, int *pages_freq){
+long long swapping_least_frequent(long long *pages, long long num_pages, long long *space_available, process_t *process, deque_t *process_queue,
+                    long long simulation_time_elapsed, long long process_pages_req, long long *loading_cost, long long *pages_freq){
     /**
      * Try to load al the pages, but (if space_available < process_pages,
      *      if at least 4 empty (space_available >= 4           => fill until space_available == 0 || pages_remaining == 0),
      *      if not at least 4 empty pages (space_available < 4) => remove least recent by by page until space_available == 4;
      */
 
-    int currently_in_mem = count_process_mem(pages, num_pages, process);
+    long long currently_in_mem = count_process_mem(pages, num_pages, process);
     /**
      *  If the process already meet memory requirement, and there is no space in memory to load additional pages
      *  DO NOT LOAD
@@ -34,7 +34,7 @@ int swapping_least_frequent(int *pages, int num_pages, int *space_available, pro
             /**
              * fill as much space as available
              */
-            int pages_remaining = *space_available;
+            long long pages_remaining = *space_available;
             load_pages_cm(pages, num_pages, space_available, process, pages_remaining, loading_cost, pages_freq);
         }
             /**
@@ -45,7 +45,7 @@ int swapping_least_frequent(int *pages, int num_pages, int *space_available, pro
             /**
              * If we are swapping check to see if any of the processes pages are currently in memory
              */
-            int pages_remaining;
+            long long pages_remaining;
             currently_in_mem = count_process_mem(pages, num_pages, process);
             /**
              * pass pages_remaining in to be 4 so that once 4 pages are available then it will break the discard process
@@ -71,9 +71,9 @@ int swapping_least_frequent(int *pages, int num_pages, int *space_available, pro
     return 1;
 }
 
-void load_pages_cm(int *pages, int num_pages, int *space_available, process_t *process, int pages_remaining, int *loading_cost, int *pages_freq){
+void load_pages_cm(long long *pages, long long num_pages, long long *space_available, process_t *process, long long pages_remaining, long long *loading_cost, long long *pages_freq){
 
-    for (int i = 0; i < num_pages; i++) {
+    for (long long i = 0; i < num_pages; i++) {
         if(pages[i] == -1) {
 
             pages[i] = process->pid;
@@ -97,12 +97,12 @@ void load_pages_cm(int *pages, int num_pages, int *space_available, process_t *p
     print_memory_cm(pages, num_pages, pages_freq);
 }
 
-void swap_pages_cm(int *pages, int num_pages, int *space_available, process_t *process, int pages_remaining,
-                   deque_t *process_queue, int simulation_time_elapsed, int *loading_cost, int *pages_freq){
+void swap_pages_cm(long long *pages, long long num_pages, long long *space_available, process_t *process, long long pages_remaining,
+                   deque_t *process_queue, long long simulation_time_elapsed, long long *loading_cost, long long *pages_freq){
 
 
-    int *mem_addresses = (int *) malloc(sizeof(*mem_addresses) * (process->mem_req / PAGE_SIZE));
-    int mem_addresses_len = 0;
+    long long *mem_addresses = (long long *) malloc(sizeof(*mem_addresses) * (process->mem_req / PAGE_SIZE));
+    long long mem_addresses_len = 0;
 
     /**
      * While there is not enough space to store either minimum pages or all pages if page req is < 4
@@ -113,8 +113,8 @@ void swap_pages_cm(int *pages, int num_pages, int *space_available, process_t *p
          * NOT INCLUDING CURRENT PROCESS
          */
         print_memory_cm(pages, num_pages, pages_freq);
-        int pid = determine_least_frequent_process(pages, pages_freq, num_pages, process);
-        fprintf(stderr, "Least frequent access process: %d\n", pid);
+        long long pid = determine_least_frequent_process(pages, pages_freq, num_pages, process);
+        fprintf(stderr, "Least frequent access process: %lld\n", pid);
 
         /**
          * Retrieve this process from the queue to pass to discard
@@ -142,18 +142,18 @@ void swap_pages_cm(int *pages, int num_pages, int *space_available, process_t *p
     print_evicted(simulation_time_elapsed, mem_addresses, mem_addresses_len);
 }
 
-void discard_pages_cm(int *pages, int num_pages, int *space_available, process_t *process, int pages_remaining,
-                      int *mem_addresses, int *mem_addresses_len, int *pages_freq){
+void discard_pages_cm(long long *pages, long long num_pages, long long *space_available, process_t *process, long long pages_remaining,
+                      long long *mem_addresses, long long *mem_addresses_len, long long *pages_freq){
     /**
      * DISCARD until space_available == pages_remaining
-     * will also print the evicted output
+     * will also prlong long the evicted output
      */
 
     // remove process pages from memory until space available == 4
-    int count = 0;
-    int removed_count = 0;
-    int remove = 1;
-    for(int i = 0; i < num_pages; i++){
+    long long count = 0;
+    long long removed_count = 0;
+    long long remove = 1;
+    for(long long i = 0; i < num_pages; i++){
         if(pages[i] == process->pid){
             count++;
 
@@ -190,16 +190,16 @@ void discard_pages_cm(int *pages, int num_pages, int *space_available, process_t
     }
 }
 
-void initialize_time(int *pages_freq, int num_pages){
+void initialize_time(long long *pages_freq, long long num_pages){
 
-    for(int i = 0; i < num_pages; i++){
+    for(long long i = 0; i < num_pages; i++){
         pages_freq[i] = -1;
     }
 }
 
-void update_pages_time(const int *pages, int *pages_freq, int num_pages, process_t *process){
+void update_pages_time(const long long *pages, long long *pages_freq, long long num_pages, process_t *process){
 
-    for(int i = 0; i < num_pages; i++){
+    for(long long i = 0; i < num_pages; i++){
         if(pages[i] == process->pid) {
 
             // update access frequency
@@ -208,10 +208,10 @@ void update_pages_time(const int *pages, int *pages_freq, int num_pages, process
     }
 }
 
-int determine_least_frequent_process(int *pages, const int *pages_freq, int num_pages, process_t *process){
-    int min_frequency = 100;
-    int min_frequency_index = 0;
-    for(int i = 0; i < num_pages; i++){
+long long determine_least_frequent_process(long long *pages, const long long *pages_freq, long long num_pages, process_t *process){
+    long long min_frequency = 100;
+    long long min_frequency_index = 0;
+    for(long long i = 0; i < num_pages; i++){
         if(pages_freq[i] < min_frequency && pages[i] != process->pid && pages[i] != -1) {
             min_frequency = pages_freq[i];
             min_frequency_index = i;
@@ -220,8 +220,8 @@ int determine_least_frequent_process(int *pages, const int *pages_freq, int num_
     return pages[min_frequency_index];
 }
 
-void print_memory_cm(int *pages, int num_pages, int *pages_freq){
-    for(int i = 0; i < num_pages; i++){
-        fprintf(stderr, "Page %2d: %2d\tFreq: %d\n", i, pages[i], pages_freq[i]);
+void print_memory_cm(long long *pages, long long num_pages, long long *pages_freq){
+    for(long long i = 0; i < num_pages; i++){
+        fprintf(stderr, "Page %2lld: %2lld\tFreq: %lld\n", i, pages[i], pages_freq[i]);
     }
 }
