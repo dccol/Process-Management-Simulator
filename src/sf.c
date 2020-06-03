@@ -563,7 +563,7 @@ void step_sf(deque_t *process_queue, process_t *current_process, int *simulation
 
 
         fprintf(stderr, "%d, RUNNING, id=%lld, remaining-time=%d\n", *simulation_time_elapsed, current_process->pid, current_process->time_remaining);
-        int status = run_process_sf(current_process);
+        run_process_sf(current_process);
     }
 
     /**
@@ -579,15 +579,10 @@ void step_sf(deque_t *process_queue, process_t *current_process, int *simulation
     *simulation_time_elapsed = *simulation_time_elapsed + 1;
 }
 
-int run_process_sf(process_t *process){
+void run_process_sf(process_t *process){
 
     // decrement process timer
     process->time_remaining--;
-
-    if(process->time_remaining == 0){
-        return DONE;
-    }
-    return NOT_DONE;
 }
 
 /**

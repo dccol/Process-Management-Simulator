@@ -32,7 +32,7 @@ void fc_fs(deque_t *pending_process_queue, deque_t *process_queue, char *memory_
  * @param process
  * @return
  */
-int run_process_ff(process_t *process);
+void run_process_ff(process_t *process);
 
 /**
  * Abstraction of a unit of time (second) in the simulation

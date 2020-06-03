@@ -24,7 +24,7 @@ void sf(deque_t *pending_process_queue, deque_t *process_queue, char *memory_opt
  * @param process
  * @return
  */
-int run_process_sf(process_t *process);
+void run_process_sf(process_t *process);
 
 /**
  * Abstraction of a unit of time (second) in the simulation
