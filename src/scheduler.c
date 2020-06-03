@@ -76,7 +76,7 @@ int main(int argc, char **argv) {
     else if(strstr(schedule_alg, "ff")) {
         fc_fs(pending_process_queue, process_queue, memory_opt, memory_size);
     }
-    else if(strstr(schedule_alg, "sf")){
+    else if(strstr(schedule_alg, "cs")){
         sf(pending_process_queue, process_queue, memory_opt, memory_size);
     }
     free_deque(pending_process_queue);
