@@ -238,7 +238,7 @@ void rr(deque_t *pending_process_queue, deque_t *process_queue, char *memory_opt
                     if (!strstr(memory_opt, "u")) {
 
                         discard_pages(pages, num_pages, &space_available, process, simulation_time_elapsed, pages_freq);
-                        print_memory(pages, num_pages);
+                        //print_memory(pages, num_pages);
                     }
 
                     /**
@@ -398,9 +398,7 @@ void step_rr(deque_t *process_queue, process_t *current_process, long long *simu
                 long long process_pages_req = (current_process->mem_req / PAGE_SIZE) - currently_in_mem;
                 fprintf(stderr, "Process %lld would like %lld pages of memory\n", current_process->pid, process_pages_req);
 
-                //printf("Memory Preload\n");
-                print_memory(pages, num_pages);
-                //printf("\n");
+                //print_memory(pages, num_pages);
 
                 // if currently not all the pages are in memory, check if we can load some more
                 if (currently_in_mem != (current_process->mem_req / PAGE_SIZE)) {
@@ -524,7 +522,7 @@ void step_rr(deque_t *process_queue, process_t *current_process, long long *simu
                 long long process_pages_req = (current_process->mem_req / PAGE_SIZE) - currently_in_mem;
                 fprintf(stderr, "Process %lld would like %lld pages of memory\n", current_process->pid, process_pages_req);
 
-                print_memory(pages, num_pages);
+                //print_memory(pages, num_pages);
 
                 // if currently not all the pages are in memory, check if we can load some more
                 if (currently_in_mem != (current_process->mem_req / PAGE_SIZE)) {

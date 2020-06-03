@@ -94,7 +94,7 @@ void load_pages_cm(long long *pages, long long num_pages, long long *space_avail
      * Set occupying memory to true
      */
     process->occupying_memory = 1;
-    print_memory_cm(pages, num_pages, pages_freq);
+    //print_memory_cm(pages, num_pages, pages_freq);
 }
 
 void swap_pages_cm(long long *pages, long long num_pages, long long *space_available, process_t *process, long long pages_remaining,
@@ -112,7 +112,7 @@ void swap_pages_cm(long long *pages, long long num_pages, long long *space_avail
          * Determine the process/pages least frequently accessed and discard its pages from memory ONE BY ONE
          * NOT INCLUDING CURRENT PROCESS
          */
-        print_memory_cm(pages, num_pages, pages_freq);
+        //print_memory_cm(pages, num_pages, pages_freq);
         long long pid = determine_least_frequent_process(pages, pages_freq, num_pages, process);
         fprintf(stderr, "Least frequent access process: %lld\n", pid);
 
@@ -131,7 +131,7 @@ void swap_pages_cm(long long *pages, long long num_pages, long long *space_avail
         // discard its pages from memory
         discard_pages_cm(pages, num_pages, space_available, oldest_process, pages_remaining, mem_addresses, &mem_addresses_len, pages_freq);
     }
-    print_memory_cm(pages, num_pages, pages_freq);
+    //print_memory_cm(pages, num_pages, pages_freq);
 
     /**
      * Once there is enough space available to store all process' pages, load them

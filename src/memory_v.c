@@ -91,7 +91,7 @@ void load_pages_v(long long *pages, long long num_pages, long long *space_availa
      * Set occupying memory to true
      */
     process->occupying_memory = 1;
-    print_memory(pages, num_pages);
+    //print_memory(pages, num_pages);
 }
 
 void swap_pages_v(long long *pages, long long num_pages, long long *space_available, process_t *process, long long pages_remaining,
