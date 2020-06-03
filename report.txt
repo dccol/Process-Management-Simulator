@@ -1,0 +1,8 @@
+Customised Scheduling
+Shortest First Algorithm: sorts process queue by time remaining every time a new process is inserted. This means that shorter processes are completed first before executing the longer ones.
+Performs better when shorter processes arrive later. This is because on average processes spend less time in the queue, as they no longer must wait for slow processes to finish executing before them. In effect decreasing average turnaround time, overhead, and makespan.
+Perform worse in situations where a longer process is starved of CPU. As a result, turnaround time will increase. This can present an issue if the longer process is important.
+Customised Memory
+Least Frequent Accessed algorithm: increments page access frequency during execution ticks. When swapping, processes with pages with the least frequent access are evicted first one by one.
+Performs better with lots of small processes. Allows more process to retain space in memory rather than being cycle evicted before they have a chance to execute again. This reduces load time of these processes, as well as decrease page fault penalties. In effect decreasing average turnaround time, overhead, and makespan.
+Performs worse than swapping-x when processes are larger, and less processes are able to retain memory.
