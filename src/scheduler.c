@@ -21,7 +21,7 @@
 
 void initialize_queue(FILE *processes_file, deque_t *pending_process_queue);
 
-long long main(long long argc, char **argv) {
+int main(int argc, char **argv) {
 
     // INSTANTIATE PENDING QUEUE
     deque_t *pending_process_queue = new_deque();
